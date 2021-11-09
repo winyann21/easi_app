@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "288776051292",
+    "project_id": "easi-e6c28",
+    "storage_bucket": "easi-e6c28.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288776051292:android:26d659b274454443c86499",
+        "android_client_info": {
+          "package_name": "com.android.easi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288776051292-gvgtv96h4n9o0fsuloi81bn5f2ido6cv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_uNGuEpKfT4fJBKA-Vtg0tUmq5Q4yMes"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288776051292-gvgtv96h4n9o0fsuloi81bn5f2ido6cv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
