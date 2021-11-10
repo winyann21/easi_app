@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
+import 'package:easi/utils/notification_id.dart';
 import 'package:easi/utils/product_validations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -354,7 +355,7 @@ class _ProductAddState extends State<ProductAdd> {
     if (newDate == null) return;
     setState(() {
       date = newDate;
-      _expiryDateController.text = DateFormat('MM-dd-yyyy').format(newDate);
+      _expiryDateController.text = DateFormat('yyyy-MM-dd').format(newDate);
     });
   }
 
@@ -364,12 +365,6 @@ class _ProductAddState extends State<ProductAdd> {
       onPressed: () async {
         try {
           if (_productAddFormKey.currentState!.validate()) {
-            var rng = new Random();
-            int id = 0;
-            for (var i = 0; i < 10; i++) {
-              id = (rng.nextInt(10000));
-            }
-
             String barcode = _barcodeController.text;
             String name = _nameController.text;
             int quantity = int.parse(_quantityController.text);
@@ -393,7 +388,7 @@ class _ProductAddState extends State<ProductAdd> {
 
             await db
                 .addProduct(
-              uniqueID: id,
+              uniqueID: createUniqueId(),
               photoURL: photoUrl,
               barcode: barcode,
               name: name,
@@ -402,8 +397,6 @@ class _ProductAddState extends State<ProductAdd> {
               numOfItemSold: 0,
               price: price,
               expiryDate: expiryDate,
-
-              //TODO::ADD TYPE FIELD
             )
                 .then((value) {
               _barcodeController.clear();
@@ -411,6 +404,7 @@ class _ProductAddState extends State<ProductAdd> {
               _priceController.clear();
               _quantityController.clear();
               _expiryDateController.clear();
+              _typeController.clear();
             });
 
             showToast(msg: "Product Added");

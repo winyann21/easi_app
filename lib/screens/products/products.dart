@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls
+// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls, avoid_print, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/api/pdf_api.dart';
@@ -191,7 +191,7 @@ class _ProductsState extends State<Products> {
                   ((QueryDocumentSnapshot<Object?> data) {
                     //*GET DATE NOW
                     var getDateNow = DateTime.now();
-                    var formatDateNow =
+                    final formatDateNow =
                         DateFormat('MM-dd-yyyy').format(getDateNow);
 
                     //*GET EXPIRYDATE
@@ -211,76 +211,79 @@ class _ProductsState extends State<Products> {
                     final String dateCreated =
                         DateFormat('MM-dd-yyyy').format(date);
 
-                    // //*NOTIFICATIONS
+                    //*****NOTIFICATIONS****/
 
-                    String? expiryMessage = '';
-                    String? quantityMessage = '';
-                    var schedNotifForExpiry =
-                        DateTime.now().add(Duration(minutes: 3));
-                    var schedNotifForQuantity =
-                        DateTime.now().add(Duration(minutes: 3));
-
-                    //*FOR EXPIRED ITEM
-                    if (formatDateNow == getExpiryDate) {
-                      expiryMessage = '$name has expired';
-                      // ignore: deprecated_member_use
-                      _notificationService.notificationsPlugin
-                          // ignore: deprecated_member_use
-                          .schedule(
-                        uniqueID, //!CAN BE CHANGED (ID)
-                        expiryMessage,
-                        'Expiry Date: $getExpiryDate',
-                        schedNotifForExpiry,
-                        _notificationService.notificationDetails,
-                      )
-                          .then((value) {
-                        Future.delayed(Duration(minutes: 3), () async {
-                          await ndb.addNotif(
-                            expiryMessage: expiryMessage!,
-                            expiryDateStatus:
-                                getExpiryDate == "" ? "" : getExpiryDate,
-                            quantityMessage: quantityMessage!,
-                            quantityStatus:
-                                quantity != 0 ? '' : quantity.toString(),
-                            id: data.id,
-                          );
-                        });
-                      });
-                    } else {
-                      ndb.deleteNotif(id: data.id);
+                    int daysBetween(DateTime from, DateTime to) {
+                      from = DateTime(from.year, from.month, from.day);
+                      to = DateTime(to.year, to.month, to.day);
+                      return (to.difference(from).inDays).round();
                     }
 
-                    //*FOR OUT OF STOCK ITEMS
+                    final expDate = DateTime.parse(getExpiryDate);
+                    final dateNow = DateTime.now();
+                    final dayDifference = daysBetween(dateNow, expDate);
+
+                    var duration = expDate.subtract(Duration(days: 30));
+
+                    //*EXPIRY DATE
+                    var expiryMessage = dayDifference <= 0
+                        ? '$name has expired'
+                        : '$name will be expiring at $getExpiryDate';
+
+                    var expiryDateStatus = dayDifference <= 0
+                        ? 'Expiry Date: $getExpiryDate'
+                        : '$dayDifference day/s left.';
+
+                    //*QUANTITY
+                    var quantityMessage =
+                        quantity > 10 ? '' : '$name needs to be restocked.';
+                    var quantityStatus =
+                        quantity > 10 ? '' : 'Item/s left: $quantity';
+
+                    _notificationService.notificationsPlugin
+                        .schedule(
+                      uniqueID,
+                      expiryMessage,
+                      expiryDateStatus,
+                      duration,
+                      _notificationService.notificationDetails,
+                    )
+                        .whenComplete(() async {
+                      if (dayDifference < 30) {
+                        await ndb.addNotif(
+                          expiryMessage: expiryMessage,
+                          expiryDateStatus: expiryDateStatus,
+                          quantityMessage: quantityMessage,
+                          quantityStatus: quantityStatus,
+                          id: data.id,
+                        );
+                      } else {
+                        await ndb.deleteNotif(id: data.id);
+                      }
+                    });
+
                     if (quantity <= 10) {
-                      quantityMessage = '$name needs to be restocked';
-                      // ignore: deprecated_member_use
                       _notificationService.notificationsPlugin
-                          // ignore: deprecated_member_use
-                          .schedule(
-                        uniqueID, //!CAN BE CHANGED (ID)
+                          .show(
+                        uniqueID,
                         quantityMessage,
-                        '$quantity items left',
-                        schedNotifForQuantity,
+                        quantityStatus,
                         _notificationService.notificationDetails,
                       )
-                          .then((value) {
-                        Future.delayed(Duration(minutes: 3), () async {
+                          .whenComplete(() async {
+                        if (quantity <= 10) {
                           await ndb.addNotif(
-                            expiryMessage: expiryMessage!,
-                            expiryDateStatus:
-                                getExpiryDate == "" ? "" : getExpiryDate,
-                            quantityMessage: quantityMessage!,
-                            quantityStatus:
-                                quantity != 0 ? '' : quantity.toString(),
+                            expiryMessage: expiryMessage,
+                            expiryDateStatus: expiryDateStatus,
+                            quantityMessage: quantityMessage,
+                            quantityStatus: quantityStatus,
                             id: data.id,
                           );
-                        });
+                        } else {
+                          await ndb.deleteNotif(id: data.id);
+                        }
                       });
-                    } else {
-                      ndb.deleteNotif(id: data.id);
                     }
-
-                    //TODO: ADD TO NOTIF SCREEN
 
                     //*DISPLAY DATA
                     return Padding(

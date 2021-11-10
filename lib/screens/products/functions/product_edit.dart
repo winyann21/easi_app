@@ -368,7 +368,7 @@ class _ProductEditState extends State<ProductEdit> {
     if (newDate == null) return;
     setState(() {
       date = newDate;
-      _expiryDateController.text = DateFormat('MM-dd-yyyy').format(newDate);
+      _expiryDateController.text = DateFormat('yyyy-MM-dd').format(newDate);
     });
   }
 
@@ -414,6 +414,7 @@ class _ProductEditState extends State<ProductEdit> {
               _priceController.clear();
               _quantityController.clear();
               _expiryDateController.clear();
+              _typeController.clear();
             });
 
             showToast(msg: "Product Updated");

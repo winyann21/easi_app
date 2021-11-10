@@ -258,11 +258,6 @@ class _PurchaseState extends State<Purchase> {
                 TextButton(
                   onPressed: () async {
                     //*GENERATE RANDOM ID FOR NOTIFICATIONS
-                    var rng = new Random();
-                    int randID = 0;
-                    for (var i = 0; i < 10; i++) {
-                      randID = (rng.nextInt(10000));
-                    }
 
                     //*COMPUTATION FOR QUANTITY, TOTAL PRICE AND NUMBER OF ITEM SOLD
                     itemSold = (itemSold! + amount);
@@ -296,17 +291,6 @@ class _PurchaseState extends State<Purchase> {
                           totalSales: totalSales! + totalPriceItemSold!,
                         );
                       });
-                    }
-
-                    //*NOTIFICATION IF NEED TO RESTOCK (QUANTITY <= 10)
-                    if (quantity! <= 10) {
-                      // ignore: deprecated_member_use
-                      _notificationService.notificationsPlugin.show(
-                        randID, //!CAN BE CHANGED (ID)
-                        '$name needs to be restocked.',
-                        '$quantity items left',
-                        _notificationService.notificationDetails,
-                      );
                     }
 
                     showToast(msg: "Item Purchased");
