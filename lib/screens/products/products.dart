@@ -240,6 +240,7 @@ class _ProductsState extends State<Products> {
                     var quantityStatus =
                         quantity > 10 ? '' : 'Item/s left: $quantity';
 
+                    //TODO:: ADD FUTURE DELAYED HERE IF IT'S OK
                     _notificationService.notificationsPlugin
                         .schedule(
                       uniqueID,
