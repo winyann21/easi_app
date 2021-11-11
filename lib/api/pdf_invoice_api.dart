@@ -114,7 +114,6 @@ class PdfInvoiceApi {
         5: FixedColumnWidth(80),
         6: FixedColumnWidth(80),
         7: FixedColumnWidth(80),
-        8: FixedColumnWidth(80),
       },
       cellStyle: pw.TextStyle(fontSize: 8),
       cellAlignments: {
@@ -178,7 +177,7 @@ class PdfInvoiceApi {
       alignment: Alignment.centerRight,
       child: Row(
         children: [
-          Spacer(flex: 6),
+          Spacer(flex: 8),
           Expanded(
             flex: 4,
             child: Column(
