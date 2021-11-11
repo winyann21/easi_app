@@ -114,6 +114,7 @@ class PdfInvoiceApi {
         5: FixedColumnWidth(80),
         6: FixedColumnWidth(80),
         7: FixedColumnWidth(80),
+        8: FixedColumnWidth(80),
       },
       cellStyle: pw.TextStyle(fontSize: 8),
       cellAlignments: {
