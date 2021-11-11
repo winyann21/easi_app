@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/api/pdf_api.dart';
 import 'package:easi/models/invoice.dart';
 import 'package:easi/utils.dart';
@@ -47,13 +48,22 @@ class PdfInvoiceApi {
     final headers = [
       //ito yung title sa list boi, edit mo nalang mga names
       'Name',
-      'Number Of Item Sold',
+      'Barcode',
+      'Date Added',
+      'Expiry Date',
+      'Quantity',
+      'Item Sold',
       'Price',
       'Total',
     ];
     final data = invoice.items.map((item) {
       //*CALCULATE TOTAL SALES
       String prodName;
+      String barcode;
+      Timestamp dateAdded;
+      DateTime dateAdd;
+      String strDateAdd;
+      String dateExpiry;
       double prodPrice;
       int prodNumOfItemSold;
       int prodQuantity;
@@ -61,15 +71,25 @@ class PdfInvoiceApi {
       double totalSales = 0.0;
 
       prodName = item.get('name');
+      barcode = item.get('barcode');
+      dateAdded = item.get('dateAdded');
+      dateExpiry = item.get('expiryDate');
       prodPrice = item.get('price');
       prodQuantity = item.get('quantity');
       prodNumOfItemSold = item.get('numOfItemSold');
 
+      dateAdd = DateTime.parse(dateAdded.toDate().toString());
+      strDateAdd = DateFormat('MM-dd-yyyy').format(dateAdd);
       totalPrice = (prodPrice * double.parse(prodNumOfItemSold.toString()));
+      totalSales = (totalSales + totalPrice);
 
       return [
         // ito para madisplay yung mga product data (name, quantity, etc.....)
         item.get('name'),
+        item.get('barcode'),
+        strDateAdd,
+        item.get('expiryDate'),
+        item.get('quantity'),
         item.get('numOfItemSold'),
         item.get('price'),
         totalPrice,
@@ -80,14 +100,19 @@ class PdfInvoiceApi {
       headers: headers,
       data: data,
       border: null,
-      headerStyle: TextStyle(fontWeight: FontWeight.bold),
+      headerStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 8),
       headerDecoration: BoxDecoration(color: PdfColors.grey300),
-      cellHeight: 30,
+      cellHeight: 40,
+      cellStyle: pw.TextStyle(fontSize: 8),
       cellAlignments: {
         0: Alignment.centerLeft,
-        1: Alignment.centerRight,
-        2: Alignment.centerRight,
-        3: Alignment.centerRight,
+        1: Alignment.centerLeft,
+        2: Alignment.centerLeft,
+        3: Alignment.centerLeft,
+        4: Alignment.centerLeft,
+        5: Alignment.centerLeft,
+        6: Alignment.centerLeft,
+        7: Alignment.centerLeft,
       },
     );
   }
@@ -97,21 +122,35 @@ class PdfInvoiceApi {
     final data = invoice.items.map((item) {
       //*CALCULATE TOTAL SALES
       String prodName;
+      String barcode;
+      Timestamp dateAdded;
+      DateTime dateAdd;
+      String strDateAdd;
+      String dateExpiry;
       double prodPrice;
       int prodNumOfItemSold;
       int prodQuantity;
       double totalPrice;
 
       prodName = item.get('name');
+      barcode = item.get('barcode');
+      dateAdded = item.get('dateAdded');
+      dateExpiry = item.get('expiryDate');
       prodPrice = item.get('price');
       prodQuantity = item.get('quantity');
       prodNumOfItemSold = item.get('numOfItemSold');
 
+      dateAdd = DateTime.parse(dateAdded.toDate().toString());
+      strDateAdd = DateFormat('MM-dd-yyyy').format(dateAdd);
       totalPrice = (prodPrice * double.parse(prodNumOfItemSold.toString()));
       totalSales = (totalSales + totalPrice);
       return [
         // ito para madisplay yung mga product data (name, quantity, etc.....)
         item.get('name'),
+        item.get('barcode'),
+        strDateAdd,
+        item.get('expiryDate'),
+        item.get('quantity'),
         item.get('numOfItemSold'),
         item.get('price'),
         totalPrice,
@@ -122,7 +161,7 @@ class PdfInvoiceApi {
       alignment: Alignment.centerRight,
       child: Row(
         children: [
-          Spacer(flex: 6),
+          Spacer(flex: 8),
           Expanded(
             flex: 4,
             child: Column(
