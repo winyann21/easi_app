@@ -49,6 +49,7 @@ class PdfInvoiceApi {
   static Widget buildInvoice(Invoice invoice) {
     final headers = [
       //ito yung title sa list boi, edit mo nalang mga names
+
       'Name',
       'Barcode',
       'Type',
@@ -59,6 +60,7 @@ class PdfInvoiceApi {
       'Number Of Item Sold',
       'Total',
     ];
+
     final data = invoice.items.map((item) {
       //*CALCULATE TOTAL Price
       String prodName;
@@ -91,8 +93,8 @@ class PdfInvoiceApi {
         prodType,
         prodDateAdded,
         prodExpiryDate,
-        prodPrice,
         prodQuantity,
+        prodPrice,
         prodNumOfItemSold,
         totalPrice,
       ];
@@ -133,45 +135,17 @@ class PdfInvoiceApi {
 
   static Widget buildTotal(Invoice invoice) {
     double totalSales = 0.0;
-    final data = invoice.items.map((item) {
-      //*CALCULATE TOTAL SALES
 
-      String prodName;
-      String prodBarcode;
-      String prodExpiryDate;
-      Timestamp prodDateCreated;
+    invoice.items.map((item) {
+      //*CALCULATE TOTAL SALES
       double prodPrice;
-      String prodType;
       int prodNumOfItemSold;
-      int prodQuantity;
       double totalPrice;
 
-      prodName = item.get('name');
-      prodBarcode = item.get('barcode');
-      prodType = item.get('type');
-      prodDateCreated = item.get('dateAdded');
-      prodExpiryDate = item.get('expiryDate');
-      prodDateCreated = item.get('dateAdded');
-      DateTime date = DateTime.fromMicrosecondsSinceEpoch(
-          prodDateCreated.microsecondsSinceEpoch);
-      final String prodDateAdded = DateFormat('MM-dd-yyyy').format(date);
       prodPrice = item.get('price');
-      prodQuantity = item.get('quantity');
       prodNumOfItemSold = item.get('numOfItemSold');
       totalPrice = (prodPrice * double.parse(prodNumOfItemSold.toString()));
       totalSales = (totalSales + totalPrice);
-      return [
-        // ito para madisplay yung mga product data (name, quantity, etc.....)
-        prodName,
-        prodBarcode,
-        prodType,
-        prodDateAdded,
-        prodExpiryDate,
-        prodPrice,
-        prodQuantity,
-        prodNumOfItemSold,
-        totalPrice,
-      ];
     }).toList();
 
     return Container(
