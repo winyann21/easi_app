@@ -203,6 +203,7 @@ class _ProductsState extends State<Products> {
                     final double price = data.get('price').toDouble();
                     final int quantity = data.get('quantity');
                     final String photoURL = data.get('photoURL');
+                    final String productId = data.id;
 
                     //*GET TIMESTAMP DATEADDED FIELD
                     Timestamp time = data.get('dateAdded') ?? Timestamp.now();
@@ -241,39 +242,20 @@ class _ProductsState extends State<Products> {
                         quantity > 10 ? '' : 'Item/s left: $quantity';
 
                     //TODO:: ADD FUTURE DELAYED HERE IF IT'S OK
-                    _notificationService.notificationsPlugin
-                        .schedule(
-                      uniqueID,
-                      expiryMessage,
-                      expiryDateStatus,
-                      duration,
-                      _notificationService.notificationDetails,
-                    )
-                        .whenComplete(() async {
-                      if (dayDifference < 30) {
-                        await ndb.addNotif(
-                          expiryMessage: expiryMessage,
-                          expiryDateStatus: expiryDateStatus,
-                          quantityMessage: quantityMessage,
-                          quantityStatus: quantityStatus,
-                          id: data.id,
-                        );
-                      } else {
-                        await ndb.deleteNotif(id: data.id);
-                      }
-                    });
 
-                    if (quantity <= 10) {
-                      _notificationService.notificationsPlugin
-                          .show(
+                    Future.delayed(Duration(minutes: 1), () async {
+                      await _notificationService.notificationsPlugin
+                          .schedule(
                         uniqueID,
-                        quantityMessage,
-                        quantityStatus,
+                        expiryMessage,
+                        expiryDateStatus,
+                        duration,
                         _notificationService.notificationDetails,
                       )
                           .whenComplete(() async {
-                        if (quantity <= 10) {
+                        if (dayDifference < 30) {
                           await ndb.addNotif(
+                            productId: productId,
                             expiryMessage: expiryMessage,
                             expiryDateStatus: expiryDateStatus,
                             quantityMessage: quantityMessage,
@@ -284,7 +266,31 @@ class _ProductsState extends State<Products> {
                           await ndb.deleteNotif(id: data.id);
                         }
                       });
-                    }
+
+                      if (quantity <= 10) {
+                        await _notificationService.notificationsPlugin
+                            .show(
+                          uniqueID,
+                          quantityMessage,
+                          quantityStatus,
+                          _notificationService.notificationDetails,
+                        )
+                            .whenComplete(() async {
+                          if (quantity <= 10) {
+                            await ndb.addNotif(
+                              productId: productId,
+                              expiryMessage: expiryMessage,
+                              expiryDateStatus: expiryDateStatus,
+                              quantityMessage: quantityMessage,
+                              quantityStatus: quantityStatus,
+                              id: data.id,
+                            );
+                          } else {
+                            await ndb.deleteNotif(id: data.id);
+                          }
+                        });
+                      }
+                    });
 
                     //*DISPLAY DATA
                     return Padding(

@@ -3,6 +3,7 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/controllers/user_controller.dart';
+import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/products/products.dart';
 import 'package:easi/screens/profile_drawer/drawer_screen.dart';
@@ -44,16 +45,18 @@ class _HomeState extends State<Home> {
             ? Text(
                 "Products",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black,
+                ),
               )
             : Text(
                 "Stats",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Colors.black,
+                ),
               ),
         elevation: 1,
         backgroundColor: Colors.white,
@@ -65,7 +68,9 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.search),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(() => Notifications());
+            },
             icon: Icon(Icons.notifications),
           ),
         ],

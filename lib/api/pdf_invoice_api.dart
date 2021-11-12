@@ -49,7 +49,6 @@ class PdfInvoiceApi {
   static Widget buildInvoice(Invoice invoice) {
     final headers = [
       //ito yung title sa list boi, edit mo nalang mga names
-
       'Name',
       'Barcode',
       'Type',

@@ -20,9 +20,11 @@ class NotificationDB {
     required String quantityMessage,
     required String quantityStatus,
     required String id,
+    required String productId,
   }) async {
     try {
       await notificationCollection.doc(id).set({
+        'productId': productId,
         'expiryMessage': expiryMessage,
         'expiryDateStatus': expiryDateStatus,
         'quantityMessage': quantityMessage,

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
+import 'package:easi/widgets/app_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -53,9 +54,13 @@ class _StatsState extends State<Stats> {
         stream:
             _salesCollection.where('month', isEqualTo: dateMonth).snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData) {
             return Center(
-              child: Text('No data'),
+              child: Loading(),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No data yet.'),
             );
           } else {
             return ListView(
