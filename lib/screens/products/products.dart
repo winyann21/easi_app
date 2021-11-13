@@ -243,7 +243,7 @@ class _ProductsState extends State<Products> {
 
                     //TODO:: ADD FUTURE DELAYED HERE IF IT'S OK
 
-                    Future.delayed(Duration(minutes: 1), () async {
+                    Future.delayed(Duration(seconds: 1), () async {
                       await _notificationService.notificationsPlugin
                           .schedule(
                         uniqueID,

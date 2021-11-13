@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
+import 'package:easi/screens/products/functions/product_edit.dart';
 import 'package:easi/services/notification_database.dart';
 import 'package:easi/widgets/app_loading.dart';
 import 'package:flutter/material.dart';
@@ -76,74 +77,115 @@ class _NotificationsState extends State<Notifications> {
                   return Column(
                     children: [
                       StreamBuilder(
-                        stream: _productCollection
-                            .doc(productId) //ID OF DOCUMENT
-                            .snapshots(),
-                        builder: (context, snapshot) {
+                        stream: _productCollection.doc(productId).snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
                           if (!snapshot.hasData) {
                             return Center(
                               child: Loading(),
                             );
                           } else {
+                            final String name = snapshot.data!['name'];
+                            final String barcode = snapshot.data!['barcode'];
+                            final String type = snapshot.data!['type'];
+                            final String expiryDate =
+                                snapshot.data!['expiryDate'];
+                            final String photoUrl = snapshot.data!['photoURL'];
+                            final double price = snapshot.data!['price'];
+                            final int quantity = snapshot.data!['quantity'];
+
                             return Padding(
-                              padding: const EdgeInsets.all(24.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: Card(
-                                margin: const EdgeInsets.all(12.0),
-                                child: ListTile(
-                                  onTap: () {},
-                                  title: Text(
-                                    expiryMessage,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            expiryDateStatus,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                margin: EdgeInsets.fromLTRB(4, 2, 4, 2),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    onTap: () {
+                                      Get.to(
+                                        () => ProductEdit(
+                                          productId: productId,
+                                          barcode: barcode,
+                                          photoUrl: photoUrl,
+                                          name: name,
+                                          type: type,
+                                          price: price,
+                                          quantity: quantity,
+                                          expiryDate: expiryDate,
+                                        ),
+                                      );
+                                    },
+                                    //*EXPIRY MESSAGE
+                                    //*EXPIRY STATUS
+                                    //*QUANTITY MESSAGE
+                                    //*QUANTITY STATUS
+                                    leading: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: photoUrl == ""
+                                          ? Image.network(
+                                              "https://i.ibb.co/r7pkB30/default-thumbnail-icon.png",
+                                              width: 70,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.network(
+                                              photoUrl,
+                                              width: 70,
+                                              fit: BoxFit.cover,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      // Row(
-                                      //   children: [
-                                      //     Text(
-                                      //       quantityMessage, //TODO:: IF NOT QUANTITY NOTIF
-                                      //       style: TextStyle(
-                                      //         fontWeight: FontWeight.bold,
-                                      //         color: Colors.black,
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                      // Row(
-                                      //   children: [
-                                      //     Text(
-                                      //       quantityStatus,
-                                      //       style: TextStyle(
-                                      //         fontWeight: FontWeight.bold,
-                                      //         color: Colors.black,
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                    ],
-                                  ),
-                                  trailing: Icon(
-                                    Icons.keyboard_arrow_right_sharp,
+                                    ),
+
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        expiryMessage == ""
+                                            ? Container()
+                                            : Text(
+                                                expiryMessage,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                        expiryDateStatus == ""
+                                            ? Container()
+                                            : Text(
+                                                expiryDateStatus,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                        quantityMessage == ""
+                                            ? Container()
+                                            : Text(
+                                                quantityMessage,
+                                                style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                        quantityStatus == ""
+                                            ? Container()
+                                            : Text(
+                                                quantityStatus,
+                                                style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                      ],
+                                    ),
+                                    trailing: Icon(
+                                      Icons.keyboard_arrow_right_sharp,
+                                    ),
                                   ),
                                 ),
                               ),
                             );
                           }
                         },
-                      ),
+                      )
                     ],
                   );
                 }),

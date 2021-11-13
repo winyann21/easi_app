@@ -16,16 +16,24 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class ProductEdit extends StatefulWidget {
-  // final String? productId, name, barcode, type, photoUrl;
-  // final double? price;
-  // final int? quantity;
+  final String? productId, name, barcode, type, photoUrl, expiryDate;
+  final double? price;
+  final int? quantity;
 
   // final ProductModel? products;
   final QueryDocumentSnapshot<Object?>? data;
 
   const ProductEdit({
     Key? key,
-    required this.data,
+    this.data,
+    this.productId,
+    this.name,
+    this.barcode,
+    this.type,
+    this.photoUrl,
+    this.price,
+    this.quantity,
+    this.expiryDate,
   }) : super(key: key);
 
   @override
@@ -56,14 +64,25 @@ class _ProductEditState extends State<ProductEdit> {
 
   @override
   void initState() {
-    _barcodeController.text = widget.data!.get('barcode');
-    _nameController.text = widget.data!.get('name');
-    _typeController.text = widget.data!.get('type');
-    _quantityController.text = widget.data!.get('quantity').toString();
-    _priceController.text = widget.data!.get('price').toString();
-    _expiryDateController.text = widget.data!.get('expiryDate');
-    photoUrl = widget.data!.get('photoURL');
-    productId = widget.data!.id;
+    _barcodeController.text =
+        widget.data != null ? widget.data!.get('barcode') : widget.barcode;
+    _nameController.text =
+        widget.data != null ? widget.data!.get('name') : widget.name;
+    _typeController.text =
+        widget.data != null ? widget.data!.get('type') : widget.type;
+    _quantityController.text = widget.data != null
+        ? widget.data!.get('quantity').toString()
+        : widget.quantity.toString();
+    _priceController.text = widget.data != null
+        ? widget.data!.get('price').toString()
+        : widget.price.toString();
+    _expiryDateController.text = widget.data != null
+        ? widget.data!.get('expiryDate')
+        : widget.expiryDate;
+    photoUrl =
+        widget.data != null ? widget.data!.get('photoURL') : widget.photoUrl;
+    productId = (widget.data != null ? widget.data!.id : widget.productId)!;
+
     super.initState();
   }
 

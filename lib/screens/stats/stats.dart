@@ -121,6 +121,7 @@ class _StatsState extends State<Stats> {
                                               child: Text('No data'),
                                             )
                                           : Card(
+                                            
                                               margin: EdgeInsets.fromLTRB(
                                                   4, 2, 4, 2),
                                               child: Padding(
