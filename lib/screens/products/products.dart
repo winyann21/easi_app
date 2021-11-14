@@ -241,10 +241,10 @@ class _ProductsState extends State<Products> {
                     var quantityStatus =
                         quantity > 10 ? '' : 'Item/s left: $quantity';
 
-                    //TODO:: ADD FUTURE DELAYED HERE IF IT'S OK
+                    //TODO::CHECK IF NOTIFICATION DOCUMENT ALREADY EXISTS, TO REDUCE DUPLICATE CALLS
 
-                    Future.delayed(Duration(minutes: 15), () async {
-                      await _notificationService.notificationsPlugin
+                    Future.delayed(Duration(minutes: 5), () async {
+                      _notificationService.notificationsPlugin
                           .schedule(
                         uniqueID,
                         expiryMessage,
@@ -266,31 +266,31 @@ class _ProductsState extends State<Products> {
                           await ndb.deleteNotif(id: data.id);
                         }
                       });
-
-                      if (quantity <= 10) {
-                        await _notificationService.notificationsPlugin
-                            .show(
-                          uniqueID,
-                          quantityMessage,
-                          quantityStatus,
-                          _notificationService.notificationDetails,
-                        )
-                            .whenComplete(() async {
-                          if (quantity <= 10) {
-                            await ndb.addNotif(
-                              productId: productId,
-                              expiryMessage: expiryMessage,
-                              expiryDateStatus: expiryDateStatus,
-                              quantityMessage: quantityMessage,
-                              quantityStatus: quantityStatus,
-                              id: data.id,
-                            );
-                          } else {
-                            await ndb.deleteNotif(id: data.id);
-                          }
-                        });
-                      }
                     });
+
+                    if (quantity <= 10) {
+                      _notificationService.notificationsPlugin
+                          .show(
+                        uniqueID,
+                        quantityMessage,
+                        quantityStatus,
+                        _notificationService.notificationDetails,
+                      )
+                          .whenComplete(() async {
+                        if (quantity <= 10) {
+                          await ndb.addNotif(
+                            productId: productId,
+                            expiryMessage: expiryMessage,
+                            expiryDateStatus: expiryDateStatus,
+                            quantityMessage: quantityMessage,
+                            quantityStatus: quantityStatus,
+                            id: data.id,
+                          );
+                        } else {
+                          await ndb.deleteNotif(id: data.id);
+                        }
+                      });
+                    }
 
                     //*DISPLAY DATA
                     return Padding(
