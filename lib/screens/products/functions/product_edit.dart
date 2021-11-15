@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_new
+// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -62,14 +62,30 @@ class _ProductEditState extends State<ProductEdit> {
   String photoUrl = '';
   String productId = '';
 
+  final List<String> productTypes = [
+    'Clothing',
+    'Food',
+    'Drinks',
+    'Equipments',
+    'Sports',
+    'Technology',
+    'Appliances',
+    'Games',
+    'Shoes',
+    'Others',
+  ];
+  String? pType;
+  String? pTypeNull;
+  String? pTypeNull2;
+
   @override
   void initState() {
     _barcodeController.text =
         widget.data != null ? widget.data!.get('barcode') : widget.barcode;
     _nameController.text =
         widget.data != null ? widget.data!.get('name') : widget.name;
-    _typeController.text =
-        widget.data != null ? widget.data!.get('type') : widget.type;
+    pType = widget.data != null ? widget.data!.get('type') : widget.type;
+
     _quantityController.text = widget.data != null
         ? widget.data!.get('quantity').toString()
         : widget.quantity.toString();
@@ -344,16 +360,64 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  //*CATEGORY
+  //*TYPE
   Widget productType() {
-    return RoundRectTextFormField(
-      controller: _typeController,
-      hintText: 'Enter Product Type',
-      labelText: 'Type',
-      prefixIcon: Icons.category_sharp,
-      suffixIcon: null,
-      textInputAction: TextInputAction.next,
-      validator: validateProductFields,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: Colors.orange,
+          style: BorderStyle.solid,
+          width: 1,
+        ),
+      ),
+      child: DropdownButtonFormField<String>(
+        hint: Text('Select Type'),
+        decoration: InputDecoration(
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          focusedErrorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          isDense: true,
+        ),
+        isExpanded: true,
+        iconSize: 36,
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black,
+        ),
+        items: productTypes.map(buildMenuItem).toList(),
+        value: pType,
+        onChanged: (value) {
+          setState(() {
+            pType = value;
+          });
+        },
+        validator: (value) {
+          if (value == null) {
+            return 'Field is required';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  DropdownMenuItem<String> buildMenuItem(String item) {
+    return DropdownMenuItem(
+      value: item,
+      child: Text(
+        item,
+      ),
     );
   }
 
@@ -391,7 +455,7 @@ class _ProductEditState extends State<ProductEdit> {
     });
   }
 
-  //*ADD PRODUCT BUTTON
+  //*EDIT PRODUCT BUTTON
   Widget productEdit() {
     return FloatingActionButton(
       onPressed: () async {
@@ -402,7 +466,7 @@ class _ProductEditState extends State<ProductEdit> {
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
-            String type = _typeController.text;
+            String type = pType!;
 
             if (_pickedImage == null) {
             } else {

@@ -280,6 +280,7 @@ class _PurchaseState extends State<Purchase> {
                         month: dateMonth,
                       );
                     }
+                    
                     //*ELSE(UPDATE DOC)
                     // ignore: await_only_futures
                     var salesDS = await sdb.salesCollection.doc(dateMonth);

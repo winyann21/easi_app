@@ -40,7 +40,6 @@ class _ProductAddState extends State<ProductAdd> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
-  final TextEditingController _typeController = TextEditingController();
 
   final GlobalKey<FormState> _productAddFormKey = GlobalKey<FormState>();
 
@@ -48,6 +47,20 @@ class _ProductAddState extends State<ProductAdd> {
   String barcode = '';
   String photoUrl = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now()); //*GET MONTH
+
+  final List<String> productTypes = [
+    'Clothing',
+    'Food',
+    'Drinks',
+    'Equipments',
+    'Sports',
+    'Technology',
+    'Appliances',
+    'Games',
+    'Shoes',
+    'Others',
+  ];
+  String? value;
 
   @override
   void initState() {
@@ -312,16 +325,64 @@ class _ProductAddState extends State<ProductAdd> {
     );
   }
 
-  //*CATEGORY
+  //*TYPE
   Widget productType() {
-    return RoundRectTextFormField(
-      controller: _typeController,
-      hintText: 'Enter Product Type',
-      labelText: 'Type',
-      prefixIcon: Icons.category_sharp,
-      suffixIcon: null,
-      textInputAction: TextInputAction.next,
-      validator: validateProductFields,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: Colors.orange,
+          style: BorderStyle.solid,
+          width: 1,
+        ),
+      ),
+      child: DropdownButtonFormField<String>(
+        hint: Text('Select Type'),
+        decoration: InputDecoration(
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          focusedErrorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+          ),
+          isDense: true,
+        ),
+        isExpanded: true,
+        iconSize: 36,
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black,
+        ),
+        items: productTypes.map(buildMenuItem).toList(),
+        value: value,
+        onChanged: (value) {
+          setState(() {
+            this.value = value;
+          });
+        },
+        validator: (value) {
+          if (value == null) {
+            return 'Field is required';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  DropdownMenuItem<String> buildMenuItem(String item) {
+    return DropdownMenuItem(
+      value: item,
+      child: Text(
+        item,
+      ),
     );
   }
 
@@ -370,7 +431,7 @@ class _ProductAddState extends State<ProductAdd> {
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
-            String type = _typeController.text;
+            String type = value!;
 
             if (_pickedImage == null) {
               photoUrl = "";
@@ -404,7 +465,6 @@ class _ProductAddState extends State<ProductAdd> {
               _priceController.clear();
               _quantityController.clear();
               _expiryDateController.clear();
-              _typeController.clear();
             });
 
             showToast(msg: "Product Added");

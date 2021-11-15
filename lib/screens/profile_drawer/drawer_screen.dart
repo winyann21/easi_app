@@ -2,6 +2,7 @@
 
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/controllers/user_controller.dart';
+import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
 import 'package:easi/services/user_database.dart';
@@ -73,7 +74,9 @@ class _DrawerScreenState extends State<DrawerScreen> {
                           buildMenuItem(
                             menuName: 'Notifications',
                             menuIcon: Icons.notifications,
-                            onClicked: () {},
+                            onClicked: () {
+                              Get.to(() => Notifications());
+                            },
                           ),
                           const SizedBox(height: 24),
                           Divider(color: Colors.grey[850]),

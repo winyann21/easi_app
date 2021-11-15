@@ -20,6 +20,7 @@ class _StatsState extends State<Stats> {
   static final _authController = Get.find<AuthController>(); //user data
   final SalesDB sdb = SalesDB();
   final ProductDB db = ProductDB();
+  
   final CollectionReference _salesCollection = FirebaseFirestore.instance
       .collection('users')
       .doc(_authController.user!.uid)

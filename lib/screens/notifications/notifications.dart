@@ -115,10 +115,6 @@ class _NotificationsState extends State<Notifications> {
                                         ),
                                       );
                                     },
-                                    //*EXPIRY MESSAGE
-                                    //*EXPIRY STATUS
-                                    //*QUANTITY MESSAGE
-                                    //*QUANTITY STATUS
                                     leading: ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
                                       child: photoUrl == ""
@@ -133,7 +129,6 @@ class _NotificationsState extends State<Notifications> {
                                               fit: BoxFit.cover,
                                             ),
                                     ),
-
                                     subtitle: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,

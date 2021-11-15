@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls, avoid_print, deprecated_member_use
+// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls, avoid_print, deprecated_member_use, prefer_const_literals_to_create_immutables
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/api/pdf_api.dart';
@@ -41,12 +41,33 @@ class _ProductsState extends State<Products> {
       .collection('products');
 
   final isDialOpen = ValueNotifier(false);
-
+  var dayDifference;
   String? scanResult;
   String barcode = '';
   String getBarcode = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
   String dateNow = DateFormat('MM-dd-yyyy').format(DateTime.now());
+
+  final List<String> productTypes = [
+    'All',
+    'Clothing',
+    'Food',
+    'Drinks',
+    'Equipments',
+    'Sports',
+    'Technology',
+    'Appliances',
+    'Games',
+    'Shoes',
+    'Others',
+  ];
+  String? type;
+
+  @override
+  void initState() {
+    super.initState();
+    type = productTypes[0]; //* ALWAYS ALL TYPE
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +127,7 @@ class _ProductsState extends State<Products> {
                     actions: [
                       TextButton(
                         onPressed: () async {
+                          //!IF NO DATA SHOW NO DATA
                           //*PDF GENERATE
                           //*INITIALIZE VARIABLES
                           var invoice;
@@ -161,264 +183,327 @@ class _ProductsState extends State<Products> {
   }
 
   Widget getBody() {
-    // final CollectionReference _productCollection = FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(_authController.user!.uid)
-    //     .collection('products');
-
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
-      child: StreamBuilder(
-        stream: _productCollection
-            .orderBy('dateUpdated', descending: true)
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: Loading(),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text('List is currently empty, try adding items'),
-            );
-          } else {
-            return ListView(
-              physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics()),
-              children: [
-                ...snapshot.data!.docs.map(
-                  ((QueryDocumentSnapshot<Object?> data) {
-                    //*GET DATE NOW
-                    var getDateNow = DateTime.now();
-                    final formatDateNow =
-                        DateFormat('MM-dd-yyyy').format(getDateNow);
-
-                    //*GET EXPIRYDATE
-                    String getExpiryDate = data.get('expiryDate');
-
-                    //*GET DATAS
-                    final String name = data.get('name');
-                    final int uniqueID = data.get('uniqueID');
-                    final double price = data.get('price').toDouble();
-                    final int quantity = data.get('quantity');
-                    final String photoURL = data.get('photoURL');
-                    final String productId = data.id;
-
-                    //*GET TIMESTAMP DATEADDED FIELD
-                    Timestamp time = data.get('dateAdded') ?? Timestamp.now();
-                    DateTime date = DateTime.fromMicrosecondsSinceEpoch(
-                        time.microsecondsSinceEpoch);
-                    final String dateCreated =
-                        DateFormat('MM-dd-yyyy').format(date);
-
-                    //*****NOTIFICATIONS****/
-
-                    int daysBetween(DateTime from, DateTime to) {
-                      from = DateTime(from.year, from.month, from.day);
-                      to = DateTime(to.year, to.month, to.day);
-                      return (to.difference(from).inDays).round();
-                    }
-
-                    final expDate = DateTime.parse(getExpiryDate);
-                    final dateNow = DateTime.now();
-                    final dayDifference = daysBetween(dateNow, expDate);
-
-                    var duration = expDate.subtract(Duration(days: 30));
-
-                    //*EXPIRY DATE
-                    var expiryMessage = dayDifference <= 0
-                        ? '$name has expired'
-                        : '$name will be expiring at $getExpiryDate';
-
-                    var expiryDateStatus = dayDifference <= 0
-                        ? 'Expiry Date: $getExpiryDate'
-                        : '$dayDifference day/s left.';
-
-                    //*QUANTITY
-                    var quantityMessage =
-                        quantity > 10 ? '' : '$name needs to be restocked.';
-                    var quantityStatus =
-                        quantity > 10 ? '' : 'Item/s left: $quantity';
-
-                    //TODO::CHECK IF NOTIFICATION DOCUMENT ALREADY EXISTS, TO REDUCE DUPLICATE CALLS
-
-                    Future.delayed(Duration(minutes: 5), () async {
-                      _notificationService.notificationsPlugin
-                          .schedule(
-                        uniqueID,
-                        expiryMessage,
-                        expiryDateStatus,
-                        duration,
-                        _notificationService.notificationDetails,
-                      )
-                          .whenComplete(() async {
-                        if (dayDifference < 30) {
-                          await ndb.addNotif(
-                            productId: productId,
-                            expiryMessage: expiryMessage,
-                            expiryDateStatus: expiryDateStatus,
-                            quantityMessage: quantityMessage,
-                            quantityStatus: quantityStatus,
-                            id: data.id,
-                          );
-                        } else {
-                          await ndb.deleteNotif(id: data.id);
-                        }
-                      });
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.all(8.0),
+            width: 200,
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 1.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.orange,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                  isExpanded: true,
+                  iconSize: 36,
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.black,
+                  ),
+                  items: productTypes.map(buildMenuItem).toList(),
+                  value: type,
+                  onChanged: (value) {
+                    setState(() {
+                      type = value;
                     });
+                  }),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: type == 'All'
+                  ? _productCollection
+                      .orderBy('dateUpdated', descending: true)
+                      .snapshots()
+                  : _productCollection
+                      .where('type', isEqualTo: type)
+                      .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: Loading(),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text('No data'),
+                  );
+                } else {
+                  return ListView(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    children: [
+                      ...snapshot.data!.docs.map(
+                        ((QueryDocumentSnapshot<Object?> data) {
+                          //*GET DATE NOW
+                          var getDateNow = DateTime.now();
+                          final formatDateNow =
+                              DateFormat('MM-dd-yyyy').format(getDateNow);
 
-                    if (quantity <= 10) {
-                      _notificationService.notificationsPlugin
-                          .show(
-                        uniqueID,
-                        quantityMessage,
-                        quantityStatus,
-                        _notificationService.notificationDetails,
-                      )
-                          .whenComplete(() async {
-                        if (quantity <= 10) {
-                          await ndb.addNotif(
-                            productId: productId,
-                            expiryMessage: expiryMessage,
-                            expiryDateStatus: expiryDateStatus,
-                            quantityMessage: quantityMessage,
-                            quantityStatus: quantityStatus,
-                            id: data.id,
-                          );
-                        } else {
-                          await ndb.deleteNotif(id: data.id);
-                        }
-                      });
-                    }
+                          //*GET EXPIRYDATE
+                          String getExpiryDate = data.get('expiryDate');
 
-                    //*DISPLAY DATA
-                    return Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Card(
-                        margin: EdgeInsets.fromLTRB(4, 2, 4, 2),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductEdit(
-                                    data: data,
+                          //*GET DATAS
+                          final String name = data.get('name');
+                          final int uniqueID = data.get('uniqueID');
+                          final double price = data.get('price').toDouble();
+                          final int quantity = data.get('quantity');
+                          final String photoURL = data.get('photoURL');
+                          final String productId = data.id;
+
+                          //*GET TIMESTAMP DATEADDED FIELD
+                          Timestamp time =
+                              data.get('dateAdded') ?? Timestamp.now();
+                          DateTime date = DateTime.fromMicrosecondsSinceEpoch(
+                              time.microsecondsSinceEpoch);
+                          final String dateCreated =
+                              DateFormat('MM-dd-yyyy').format(date);
+
+                          //*****NOTIFICATIONS****/
+
+                          int daysBetween(DateTime from, DateTime to) {
+                            from = DateTime(from.year, from.month, from.day);
+                            to = DateTime(to.year, to.month, to.day);
+                            return (to.difference(from).inDays).round();
+                          }
+
+                          //!CHANGED!
+                          if (getExpiryDate != "") {
+                            final expDate = DateTime.parse(getExpiryDate);
+                            final dateNow = DateTime.now();
+                            dayDifference = daysBetween(dateNow, expDate);
+                            var duration = expDate.subtract(Duration(days: 30));
+
+                            //*EXPIRY DATE
+                            var expiryMessage = dayDifference <= 0
+                                ? '$name has expired'
+                                : '$name will be expiring at $getExpiryDate';
+
+                            var expiryDateStatus = dayDifference <= 0
+                                ? 'Expiry Date: $getExpiryDate'
+                                : '$dayDifference day/s left.';
+
+                            //*QUANTITY
+                            var quantityMessage = quantity > 10
+                                ? ''
+                                : '$name needs to be restocked.';
+                            var quantityStatus =
+                                quantity > 10 ? '' : 'Item/s left: $quantity';
+
+                            //TODO::CHECK IF NOTIFICATION DOCUMENT ALREADY EXISTS, TO REDUCE DUPLICATE CALLS
+
+                            _notificationService.notificationsPlugin
+                                .schedule(
+                              uniqueID,
+                              expiryMessage,
+                              expiryDateStatus,
+                              duration,
+                              _notificationService.notificationDetails,
+                            )
+                                .whenComplete(() async {
+                              if (dayDifference < 30) {
+                                await ndb.addNotif(
+                                  productId: productId,
+                                  expiryMessage: expiryMessage,
+                                  expiryDateStatus: expiryDateStatus,
+                                  quantityMessage: quantityMessage,
+                                  quantityStatus: quantityStatus,
+                                  id: data.id,
+                                );
+                              } else {
+                                await ndb.deleteNotif(id: data.id);
+                              }
+                            });
+                          }
+                          
+                          //*EXPIRY DATE
+                          var expiryMessage = dayDifference <= 0
+                              ? '$name has expired'
+                              : '$name will be expiring at $getExpiryDate';
+
+                          var expiryDateStatus = dayDifference <= 0
+                              ? 'Expiry Date: $getExpiryDate'
+                              : '$dayDifference day/s left.';
+
+                          //*QUANTITY
+                          var quantityMessage = quantity > 10
+                              ? ''
+                              : '$name needs to be restocked.';
+                          var quantityStatus =
+                              quantity > 10 ? '' : 'Item/s left: $quantity';
+
+                          if (quantity <= 10) {
+                            _notificationService.notificationsPlugin
+                                .show(
+                              uniqueID,
+                              quantityMessage,
+                              quantityStatus,
+                              _notificationService.notificationDetails,
+                            )
+                                .whenComplete(() async {
+                              if (quantity <= 10) {
+                                await ndb.addNotif(
+                                  productId: productId,
+                                  expiryMessage: expiryMessage,
+                                  expiryDateStatus: expiryDateStatus,
+                                  quantityMessage: quantityMessage,
+                                  quantityStatus: quantityStatus,
+                                  id: data.id,
+                                );
+                              } else {
+                                await ndb.deleteNotif(id: data.id);
+                              }
+                            });
+                          }
+
+                          //*DISPLAY DATA
+                          return Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Card(
+                              margin: EdgeInsets.fromLTRB(4, 2, 4, 2),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductEdit(
+                                          data: data,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  onLongPress: () async {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text(
+                                          'Delete Product',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.grey[800],
+                                          ),
+                                        ),
+                                        content: Text(
+                                            'Are you sure you want to delete this item?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              db.deleteProduct(id: data.id);
+                                              Navigator.pop(context, true);
+                                              showToast(msg: 'Product Deleted');
+                                            },
+                                            child: Text('Yes'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context, true);
+                                            },
+                                            child: Text('No'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: photoURL == ""
+                                        ? Image.network(
+                                            "https://i.ibb.co/r7pkB30/default-thumbnail-icon.png",
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            photoURL,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          ),
                                   ),
-                                ),
-                              );
-                            },
-                            onLongPress: () async {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
                                   title: Text(
-                                    'Delete Product',
+                                    name,
                                     style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.grey[800],
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  content: Text(
-                                      'Are you sure you want to delete this item?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        db.deleteProduct(id: data.id);
-                                        Navigator.pop(context, true);
-                                        showToast(msg: 'Product Deleted');
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                      child: Text('No'),
-                                    ),
-                                  ],
+                                  subtitle: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text('Available Stock(s): ',
+                                              style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                              )),
+                                          Text(
+                                            quantity.toString(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text('Price: '),
+                                          Text(
+                                            price.toString(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text('Created At: '),
+                                          Text(
+                                            dateCreated,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Icon(
+                                    Icons.keyboard_arrow_right_sharp,
+                                  ),
                                 ),
-                              );
-                            },
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: photoURL == ""
-                                  ? Image.network(
-                                      "https://i.ibb.co/r7pkB30/default-thumbnail-icon.png",
-                                      width: 70,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.network(
-                                      photoURL,
-                                      width: 70,
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                            title: Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            subtitle: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text('Available Stock(s): ',
-                                        style: TextStyle(
-                                          fontStyle: FontStyle.italic,
-                                        )),
-                                    Text(
-                                      quantity.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text('Price: '),
-                                    Text(
-                                      price.toString(),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text('Created At: '),
-                                    Text(
-                                      dateCreated,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            trailing: Icon(
-                              Icons.keyboard_arrow_right_sharp,
-                            ),
-                          ),
-                        ),
+                          );
+                        }),
                       ),
-                    );
-                  }),
-                ),
-              ],
-            );
-          }
-        },
+                    ],
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  DropdownMenuItem<String> buildMenuItem(String item) {
+    return DropdownMenuItem(
+      value: item,
+      child: Text(
+        item,
       ),
     );
   }
