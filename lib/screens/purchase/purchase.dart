@@ -247,6 +247,7 @@ class _PurchaseState extends State<Purchase> {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey[800],
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               content: change <= 0
@@ -278,7 +279,7 @@ class _PurchaseState extends State<Purchase> {
                         month: dateMonth,
                       );
                     }
-                    
+
                     //*ELSE(UPDATE DOC)
                     // ignore: await_only_futures
                     var salesDS = await sdb.salesCollection.doc(dateMonth);
@@ -296,13 +297,23 @@ class _PurchaseState extends State<Purchase> {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
-                  child: Text('Yes'),
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(
+                      color: Colors.green,
+                    ),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context, true);
                   },
-                  child: Text('No'),
+                  child: Text(
+                    'No',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
               ],
             ),

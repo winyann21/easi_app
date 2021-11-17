@@ -15,6 +15,7 @@ import 'package:easi/widgets/app_loading.dart';
 import 'package:easi/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
@@ -48,7 +49,7 @@ class _ProductsState extends State<Products> {
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
   String dateNow = DateFormat('MM-dd-yyyy').format(DateTime.now());
 
-  final List<String> productTypes = [
+  final List<String> productCategories = [
     'All',
     'Appliances',
     'Clothing',
@@ -61,12 +62,12 @@ class _ProductsState extends State<Products> {
     'Technology',
     'Others',
   ];
-  String? type;
+  String? category;
 
   @override
   void initState() {
     super.initState();
-    type = productTypes[0]; //* ALWAYS ALL TYPE
+    category = productCategories[0]; //* ALWAYS ALL CATEGORIES
   }
 
   @override
@@ -121,6 +122,7 @@ class _ProductsState extends State<Products> {
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.grey[800],
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     content: Text('Continue?'),
@@ -135,44 +137,63 @@ class _ProductsState extends State<Products> {
                           await _productCollection
                               .orderBy('numOfItemSold', descending: true)
                               .get()
-                              .then((querySnapshot) {
+                              .then((querySnapshot) async {
                             if (querySnapshot.docs.isEmpty) {
                               showToast(msg: 'No data to generate');
                             } else {
-                              querySnapshot.docs.forEach((doc) async {
-                                invoice = Invoice(
-                                  items: querySnapshot.docs,
-                                );
+                              //CHECK IF HAS SALES FOR THIS MONTH
+                              var sales = await sdb.salesCollection
+                                  .doc(dateMonth)
+                                  .get();
+                              if (!sales.exists) {
+                                showToast(msg: 'No sales has been done yet.');
+                              } else {
+                                querySnapshot.docs.forEach((doc) async {
+                                  invoice = Invoice(
+                                    items: querySnapshot.docs,
+                                  );
 
-                                pdfFile = await PdfInvoiceApi.generate(invoice);
-                                PdfApi.openFile(pdfFile);
+                                  pdfFile =
+                                      await PdfInvoiceApi.generate(invoice);
+                                  PdfApi.openFile(pdfFile);
 
-                                //!CAN BE CHANGED
-                                // //*RESET ITEMSOLD
-                                // await db.resetItemSold(
-                                //   id: doc.id,
-                                //   numOfItemSold: 0,
-                                // );
+                                  //!CAN BE CHANGED
+                                  // //*RESET ITEMSOLD
+                                  // await db.resetItemSold(
+                                  //   id: doc.id,
+                                  //   numOfItemSold: 0,
+                                  // );
 
-                                // //*RESET TOTAL SALES THIS MONTH
-                                // await sdb.updateSales(
-                                //   totalSales: 0.00,
-                                //   month: dateMonth,
-                                // );
-                                //*********************!
-                              });
+                                  // //*RESET TOTAL SALES THIS MONTH
+                                  // await sdb.updateSales(
+                                  //   totalSales: 0.00,
+                                  //   month: dateMonth,
+                                  // );
+                                  //*********************!
+                                });
+                              }
                             }
                           });
 
                           Navigator.pop(context, true);
                         },
-                        child: Text('Generate'),
+                        child: Text(
+                          'Generate',
+                          style: TextStyle(
+                            color: Colors.green,
+                          ),
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context, true);
                         },
-                        child: Text('Cancel'),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -211,23 +232,23 @@ class _ProductsState extends State<Products> {
                     Icons.arrow_drop_down,
                     color: Colors.black,
                   ),
-                  items: productTypes.map(buildMenuItem).toList(),
-                  value: type,
+                  items: productCategories.map(buildMenuItem).toList(),
+                  value: category,
                   onChanged: (value) {
                     setState(() {
-                      type = value;
+                      category = value;
                     });
                   }),
             ),
           ),
           Expanded(
             child: StreamBuilder(
-              stream: type == 'All'
+              stream: category == 'All'
                   ? _productCollection
                       .orderBy('dateUpdated', descending: true)
                       .snapshots()
                   : _productCollection
-                      .where('type', isEqualTo: type)
+                      .where('category', isEqualTo: category)
                       .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -288,30 +309,33 @@ class _ProductsState extends State<Products> {
                           );
                           dayDifference = daysBetween(dateNow, expDate);
 
+                          //*EXPIRY DATE
+                          var expiryMessage = getExpiryDate == ""
+                              ? ""
+                              : dayDifference <= 0
+                                  ? '$name has expired'
+                                  : dayDifference > 30
+                                      ? ''
+                                      : '$name will be expiring at $getExpiryDate';
+
+                          var expiryDateStatus = getExpiryDate == ""
+                              ? ""
+                              : dayDifference <= 0
+                                  ? 'Expiry Date: $getExpiryDate'
+                                  : dayDifference > 30
+                                      ? ''
+                                      : '$dayDifference day/s left.';
+
+                          //*QUANTITY
+                          var quantityMessage = quantity > 10
+                              ? ''
+                              : '$name needs to be restocked.';
+                          var quantityStatus =
+                              quantity > 10 ? '' : 'Item/s left: $quantity';
                           //CAN ADD DURATION IF NEEDED
 
                           if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
-
-                            //*EXPIRY DATE
-                            var expiryMessage = dayDifference <= 0
-                                ? '$name has expired'
-                                : dayDifference > 30
-                                    ? ''
-                                    : '$name will be expiring at $getExpiryDate';
-
-                            var expiryDateStatus = dayDifference <= 0
-                                ? 'Expiry Date: $getExpiryDate'
-                                : dayDifference > 30
-                                    ? ''
-                                    : '$dayDifference day/s left.';
-
-                            //*QUANTITY
-                            var quantityMessage = quantity > 10
-                                ? ''
-                                : '$name needs to be restocked.';
-                            var quantityStatus =
-                                quantity > 10 ? '' : 'Item/s left: $quantity';
 
                             _notificationService.notificationsPlugin
                                 .schedule(
@@ -322,46 +346,16 @@ class _ProductsState extends State<Products> {
                               _notificationService.notificationDetails,
                             )
                                 .whenComplete(() async {
-                              if (dayDifference < 30) {
-                                await ndb.addNotif(
-                                  productId: productId,
-                                  expiryMessage: expiryMessage,
-                                  expiryDateStatus: expiryDateStatus,
-                                  quantityMessage: quantityMessage,
-                                  quantityStatus: quantityStatus,
-                                  id: data.id,
-                                );
-                              }
+                              await ndb.addNotif(
+                                productId: productId,
+                                expiryMessage: expiryMessage,
+                                expiryDateStatus: expiryDateStatus,
+                                quantityMessage: quantityMessage,
+                                quantityStatus: quantityStatus,
+                                id: data.id,
+                              );
                             });
                           } else if (quantity <= 10) {
-                            final expDate = DateTime.parse(
-                              getExpiryDate == ""
-                                  ? getDateNow.toString()
-                                  : getExpiryDate,
-                            );
-                            final dateNow = DateTime.now();
-                            dayDifference = daysBetween(dateNow, expDate);
-
-                            //*EXPIRY DATE
-                            var expiryMessage = dayDifference <= 0
-                                ? '$name has expired'
-                                : dayDifference > 30
-                                    ? ''
-                                    : '$name will be expiring at $getExpiryDate';
-
-                            var expiryDateStatus = dayDifference <= 0
-                                ? 'Expiry Date: $getExpiryDate'
-                                : dayDifference > 30
-                                    ? ''
-                                    : '$dayDifference day/s left.';
-
-                            //*QUANTITY
-                            var quantityMessage = quantity > 10
-                                ? ''
-                                : '$name needs to be restocked.';
-                            var quantityStatus =
-                                quantity > 10 ? '' : 'Item/s left: $quantity';
-
                             _notificationService.notificationsPlugin
                                 .show(
                               uniqueID,
@@ -370,16 +364,14 @@ class _ProductsState extends State<Products> {
                               _notificationService.notificationDetails,
                             )
                                 .whenComplete(() async {
-                              if (quantity <= 10) {
-                                await ndb.addNotif(
-                                  productId: productId,
-                                  expiryMessage: expiryMessage,
-                                  expiryDateStatus: expiryDateStatus,
-                                  quantityMessage: quantityMessage,
-                                  quantityStatus: quantityStatus,
-                                  id: data.id,
-                                );
-                              }
+                              await ndb.addNotif(
+                                productId: productId,
+                                expiryMessage: expiryMessage,
+                                expiryDateStatus: expiryDateStatus,
+                                quantityMessage: quantityMessage,
+                                quantityStatus: quantityStatus,
+                                id: data.id,
+                              );
                             });
                           } else {
                             Future.delayed(Duration(seconds: 1), () async {
@@ -414,10 +406,11 @@ class _ProductsState extends State<Products> {
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: Colors.grey[800],
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         content: Text(
-                                            'Are you sure you want to delete this item?'),
+                                            'Deleting an item, will also reduce the total sales of this item this month. \n\nDo you wish to proceed?'),
                                         actions: [
                                           TextButton(
                                             onPressed: () async {
@@ -449,13 +442,23 @@ class _ProductsState extends State<Products> {
                                               Navigator.pop(context, true);
                                               showToast(msg: 'Product Deleted');
                                             },
-                                            child: Text('Yes'),
+                                            child: Text(
+                                              'Yes',
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                              ),
+                                            ),
                                           ),
                                           TextButton(
                                             onPressed: () {
                                               Navigator.pop(context, true);
                                             },
-                                            child: Text('No'),
+                                            child: Text(
+                                              'No',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),

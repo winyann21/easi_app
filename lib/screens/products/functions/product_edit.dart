@@ -17,7 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class ProductEdit extends StatefulWidget {
-  final String? productId, name, barcode, type, photoUrl, expiryDate;
+  final String? productId, name, barcode, category, photoUrl, expiryDate;
   final double? price;
   final int? quantity;
 
@@ -30,7 +30,7 @@ class ProductEdit extends StatefulWidget {
     this.productId,
     this.name,
     this.barcode,
-    this.type,
+    this.category,
     this.photoUrl,
     this.price,
     this.quantity,
@@ -55,7 +55,6 @@ class _ProductEditState extends State<ProductEdit> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
-  final TextEditingController _typeController = TextEditingController();
 
   final GlobalKey<FormState> _productEditFormKey = GlobalKey<FormState>();
 
@@ -65,7 +64,7 @@ class _ProductEditState extends State<ProductEdit> {
   String productId = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
-  final List<String> productTypes = [
+  final List<String> productCategories = [
     'Appliances',
     'Clothing',
     'Drinks',
@@ -77,9 +76,7 @@ class _ProductEditState extends State<ProductEdit> {
     'Technology',
     'Others',
   ];
-  String? pType;
-  String? pTypeNull;
-  String? pTypeNull2;
+  String? pCategory;
 
   @override
   void initState() {
@@ -87,7 +84,8 @@ class _ProductEditState extends State<ProductEdit> {
         widget.data != null ? widget.data!.get('barcode') : widget.barcode;
     _nameController.text =
         widget.data != null ? widget.data!.get('name') : widget.name;
-    pType = widget.data != null ? widget.data!.get('type') : widget.type;
+    pCategory =
+        widget.data != null ? widget.data!.get('category') : widget.category;
 
     _quantityController.text = widget.data != null
         ? widget.data!.get('quantity').toString()
@@ -136,9 +134,11 @@ class _ProductEditState extends State<ProductEdit> {
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.grey[800],
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    content: Text('Are you sure you want to delete this item?'),
+                    content: Text(
+                        'Deleting an item, will also reduce the total sales of this item this month. \n\nDo you wish to proceed?'),
                     actions: [
                       TextButton(
                         onPressed: () async {
@@ -227,7 +227,7 @@ class _ProductEditState extends State<ProductEdit> {
                       ),
                       SizedBox(height: 15.0),
                       //*CATEGORY
-                      productType(),
+                      productCategory(),
                       SizedBox(height: 15.0),
 
                       //*EXPIRY DATE
@@ -419,9 +419,8 @@ class _ProductEditState extends State<ProductEdit> {
   }
 
   //*TYPE
-  Widget productType() {
+  Widget productCategory() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
@@ -431,19 +430,27 @@ class _ProductEditState extends State<ProductEdit> {
         ),
       ),
       child: DropdownButtonFormField<String>(
-        hint: Text('Select Type'),
+        hint: Text('Select Category'),
         decoration: InputDecoration(
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+          prefixIcon: Icon(
+            Icons.category_sharp,
+            color: Colors.orange,
           ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.orange),
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          errorBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.orange),
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          focusedErrorBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.orange),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.orange),
+            borderRadius: BorderRadius.circular(10.0),
           ),
           isDense: true,
         ),
@@ -453,11 +460,11 @@ class _ProductEditState extends State<ProductEdit> {
           Icons.arrow_drop_down,
           color: Colors.black,
         ),
-        items: productTypes.map(buildMenuItem).toList(),
-        value: pType,
+        items: productCategories.map(buildMenuItem).toList(),
+        value: pCategory,
         onChanged: (value) {
           setState(() {
-            pType = value;
+            pCategory = value;
           });
         },
         validator: (value) {
@@ -527,7 +534,7 @@ class _ProductEditState extends State<ProductEdit> {
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
-            String type = pType!;
+            String category = pCategory!;
 
             if (_pickedImage == null) {
             } else {
@@ -547,7 +554,7 @@ class _ProductEditState extends State<ProductEdit> {
               photoURL: photoUrl,
               barcode: barcode,
               name: name,
-              type: type,
+              category: category,
               quantity: quantity,
               price: price,
               expiryDate: expiryDate,
@@ -558,7 +565,6 @@ class _ProductEditState extends State<ProductEdit> {
               _priceController.clear();
               _quantityController.clear();
               _expiryDateController.clear();
-              _typeController.clear();
             });
 
             showToast(msg: "Product Updated");

@@ -51,7 +51,7 @@ class PdfInvoiceApi {
       //ito yung title sa list boi, edit mo nalang mga names
       'Name',
       'Barcode',
-      'Type',
+      'Category',
       'Date Created',
       'Expiration Date',
       'Quantity',
@@ -67,14 +67,14 @@ class PdfInvoiceApi {
       String prodExpiryDate;
       Timestamp prodDateCreated;
       double prodPrice;
-      String prodType;
+      String prodCategory;
       int prodNumOfItemSold;
       int prodQuantity;
       double totalPrice;
 
       prodName = item.get('name');
       prodBarcode = item.get('barcode');
-      prodType = item.get('type');
+      prodCategory = item.get('category');
       prodDateCreated = item.get('dateAdded');
       DateTime date = DateTime.fromMicrosecondsSinceEpoch(
           prodDateCreated.microsecondsSinceEpoch);
@@ -89,7 +89,7 @@ class PdfInvoiceApi {
         // ito para madisplay yung mga product data (name, quantity, etc.....)
         prodName,
         prodBarcode,
-        prodType,
+        prodCategory,
         prodDateAdded,
         prodExpiryDate,
         prodQuantity,

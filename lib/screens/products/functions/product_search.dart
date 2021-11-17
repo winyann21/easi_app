@@ -138,10 +138,11 @@ class ProductSearch extends SearchDelegate {
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[800],
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 content: Text(
-                                    'Are you sure you want to delete this item?'),
+                                    'Deleting an item, will also reduce the total sales of this item this month. \n\nDo you wish to proceed?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -150,13 +151,23 @@ class ProductSearch extends SearchDelegate {
                                       Navigator.pop(context, true);
                                       showToast(msg: 'Product Deleted');
                                     },
-                                    child: Text('Yes'),
+                                    child: Text(
+                                      'Yes',
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                      ),
+                                    ),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(context, true);
                                     },
-                                    child: Text('No'),
+                                    child: Text(
+                                      'No',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -311,10 +322,11 @@ class ProductSearch extends SearchDelegate {
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[800],
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 content: Text(
-                                    'Are you sure you want to delete this item?'),
+                                    'Deleting an item, will also reduce the total sales of this item this month. \n\nDo you wish to proceed?'),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -323,13 +335,23 @@ class ProductSearch extends SearchDelegate {
                                       Navigator.pop(context, true);
                                       showToast(msg: 'Product Deleted');
                                     },
-                                    child: Text('Yes'),
+                                    child: Text(
+                                      'Yes',
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                      ),
+                                    ),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(context, true);
                                     },
-                                    child: Text('No'),
+                                    child: Text(
+                                      'No',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

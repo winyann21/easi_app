@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, unused_catch_clause
 import 'dart:io';
-import 'dart:math';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
@@ -48,7 +47,7 @@ class _ProductAddState extends State<ProductAdd> {
   String photoUrl = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now()); //*GET MONTH
 
-  final List<String> productTypes = [
+  final List<String> productCategories = [
     'Appliances',
     'Clothing',
     'Drinks',
@@ -65,6 +64,8 @@ class _ProductAddState extends State<ProductAdd> {
   @override
   void initState() {
     _barcodeController.text = widget.getBarcode!;
+
+    //!! TRY
     if (_barcodeController.text != "") {
       _quantityController.text = '1';
     }
@@ -139,7 +140,7 @@ class _ProductAddState extends State<ProductAdd> {
                       ),
                       SizedBox(height: 15.0),
                       //*CATEGORY
-                      productType(),
+                      productCategory(),
                       SizedBox(height: 15.0),
 
                       //*EXPIRY DATE
@@ -331,55 +332,54 @@ class _ProductAddState extends State<ProductAdd> {
     );
   }
 
-  //*TYPE
-  Widget productType() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        border: Border.all(
+  //*CATEGORY
+  Widget productCategory() {
+    return DropdownButtonFormField<String>(
+      hint: Text('Select Category'),
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          Icons.category_sharp,
           color: Colors.orange,
-          style: BorderStyle.solid,
-          width: 1,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.orange),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.orange),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.orange),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.orange),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        
+        isDense: true,
       ),
-      child: DropdownButtonFormField<String>(
-        hint: Text('Select Type'),
-        decoration: InputDecoration(
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          errorBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedErrorBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          isDense: true,
-        ),
-        isExpanded: true,
-        iconSize: 36,
-        icon: Icon(
-          Icons.arrow_drop_down,
-          color: Colors.black,
-        ),
-        items: productTypes.map(buildMenuItem).toList(),
-        value: value,
-        onChanged: (value) {
-          setState(() {
-            this.value = value;
-          });
-        },
-        validator: (value) {
-          if (value == null) {
-            return 'Field is required';
-          }
-          return null;
-        },
+      
+      isExpanded: true,
+      iconSize: 36,
+      icon: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.black,
       ),
+      items: productCategories.map(buildMenuItem).toList(),
+      value: value,
+      onChanged: (value) {
+        setState(() {
+          this.value = value;
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Field is required';
+        }
+        return null;
+      },
     );
   }
 
@@ -440,7 +440,7 @@ class _ProductAddState extends State<ProductAdd> {
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
-            String type = value!;
+            String category = value!;
 
             if (_pickedImage == null) {
               photoUrl = "";
@@ -462,7 +462,7 @@ class _ProductAddState extends State<ProductAdd> {
               photoURL: photoUrl,
               barcode: barcode,
               name: name,
-              type: type,
+              category: category,
               quantity: quantity,
               numOfItemSold: 0,
               price: price,

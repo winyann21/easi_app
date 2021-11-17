@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/screens/purchase/purchase.dart';
 import 'package:easi/services/product_database.dart';
-import 'package:easi/widgets/app_loading.dart';
 import 'package:easi/widgets/app_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -131,38 +130,38 @@ class PurchaseSearch extends SearchDelegate {
                               ),
                             );
                           },
-                          onLongPress: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(
-                                  'Delete Product',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
-                                content: Text(
-                                    'Are you sure you want to delete this item?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      db.deleteProduct(id: data.id);
-                                      Navigator.pop(context, true);
-                                      showToast(msg: 'Product Deleted');
-                                    },
-                                    child: Text('Yes'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    child: Text('No'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                          // onLongPress: () {
+                          //   showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //       title: Text(
+                          //         'Delete Product',
+                          //         style: TextStyle(
+                          //           fontSize: 18,
+                          //           color: Colors.grey[800],
+                          //         ),
+                          //       ),
+                          //       content: Text(
+                          //           'Are you sure you want to delete this item?'),
+                          //       actions: [
+                          //         TextButton(
+                          //           onPressed: () {
+                          //             db.deleteProduct(id: data.id);
+                          //             Navigator.pop(context, true);
+                          //             showToast(msg: 'Product Deleted');
+                          //           },
+                          //           child: Text('Yes'),
+                          //         ),
+                          //         TextButton(
+                          //           onPressed: () {
+                          //             Navigator.pop(context, true);
+                          //           },
+                          //           child: Text('No'),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   );
+                          // },
                           leading: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: photoURL == ""

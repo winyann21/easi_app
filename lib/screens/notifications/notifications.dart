@@ -87,7 +87,7 @@ class _NotificationsState extends State<Notifications> {
                           } else {
                             final String name = snapshot.data!['name'];
                             final String barcode = snapshot.data!['barcode'];
-                            final String type = snapshot.data!['type'];
+                            final String category = snapshot.data!['category'];
                             final String expiryDate =
                                 snapshot.data!['expiryDate'];
                             final String photoUrl = snapshot.data!['photoURL'];
@@ -95,11 +95,12 @@ class _NotificationsState extends State<Notifications> {
                             final int quantity = snapshot.data!['quantity'];
 
                             return Padding(
-                              padding: const EdgeInsets.all(4.0),
+                              padding: const EdgeInsets.all(8.0),
                               child: Card(
+                                elevation: 4,
                                 margin: EdgeInsets.fromLTRB(4, 2, 4, 2),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(14.0),
                                   child: ListTile(
                                     onTap: () {
                                       Get.to(
@@ -108,7 +109,7 @@ class _NotificationsState extends State<Notifications> {
                                           barcode: barcode,
                                           photoUrl: photoUrl,
                                           name: name,
-                                          type: type,
+                                          category: category,
                                           price: price,
                                           quantity: quantity,
                                           expiryDate: expiryDate,
@@ -120,12 +121,12 @@ class _NotificationsState extends State<Notifications> {
                                       child: photoUrl == ""
                                           ? Image.network(
                                               "https://i.ibb.co/r7pkB30/default-thumbnail-icon.png",
-                                              width: 70,
+                                              width: 50,
                                               fit: BoxFit.cover,
                                             )
                                           : Image.network(
                                               photoUrl,
-                                              width: 70,
+                                              width: 50,
                                               fit: BoxFit.cover,
                                             ),
                                     ),

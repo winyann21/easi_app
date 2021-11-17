@@ -92,6 +92,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.grey[800],
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   content: Text('Continue?'),
@@ -101,13 +102,23 @@ class _DrawerScreenState extends State<DrawerScreen> {
                                         _authController.signOut();
                                         Get.back();
                                       },
-                                      child: Text('Yes'),
+                                      child: Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                        ),
+                                      ),
                                     ),
                                     TextButton(
                                       onPressed: () {
                                         Get.back();
                                       },
-                                      child: Text('No'),
+                                      child: Text(
+                                        'No',
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
