@@ -50,15 +50,15 @@ class _ProductsState extends State<Products> {
 
   final List<String> productTypes = [
     'All',
+    'Appliances',
     'Clothing',
-    'Food',
     'Drinks',
     'Equipments',
-    'Sports',
-    'Technology',
-    'Appliances',
+    'Food',
     'Games',
     'Shoes',
+    'Sports',
+    'Technology',
     'Others',
   ];
   String? type;
@@ -276,21 +276,31 @@ class _ProductsState extends State<Products> {
                             return (to.difference(from).inDays).round();
                           }
 
-                          //!CHANGED!
-                          if (getExpiryDate != "") {
-                            final expDate = DateTime.parse(getExpiryDate);
-                            final dateNow = DateTime.now();
-                            dayDifference = daysBetween(dateNow, expDate);
+                          final dateNow = DateTime.now();
+                          final expDate = DateTime.parse(
+                            getExpiryDate == ""
+                                ? dateNow.toString()
+                                : getExpiryDate,
+                          );
+                          dayDifference = daysBetween(dateNow, expDate);
+
+                          //CAN ADD DURATION IF NEEDED
+
+                          if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
 
                             //*EXPIRY DATE
                             var expiryMessage = dayDifference <= 0
                                 ? '$name has expired'
-                                : '$name will be expiring at $getExpiryDate';
+                                : dayDifference > 30
+                                    ? ''
+                                    : '$name will be expiring at $getExpiryDate';
 
                             var expiryDateStatus = dayDifference <= 0
                                 ? 'Expiry Date: $getExpiryDate'
-                                : '$dayDifference day/s left.';
+                                : dayDifference > 30
+                                    ? ''
+                                    : '$dayDifference day/s left.';
 
                             //*QUANTITY
                             var quantityMessage = quantity > 10
@@ -298,8 +308,6 @@ class _ProductsState extends State<Products> {
                                 : '$name needs to be restocked.';
                             var quantityStatus =
                                 quantity > 10 ? '' : 'Item/s left: $quantity';
-
-                            //TODO::CHECK IF NOTIFICATION DOCUMENT ALREADY EXISTS, TO REDUCE DUPLICATE CALLS
 
                             _notificationService.notificationsPlugin
                                 .schedule(
@@ -319,29 +327,33 @@ class _ProductsState extends State<Products> {
                                   quantityStatus: quantityStatus,
                                   id: data.id,
                                 );
-                              } else {
-                                await ndb.deleteNotif(id: data.id);
                               }
                             });
-                          }
-                          
-                          //*EXPIRY DATE
-                          var expiryMessage = dayDifference <= 0
-                              ? '$name has expired'
-                              : '$name will be expiring at $getExpiryDate';
+                          } else if (quantity <= 10) {
+                            final expDate = DateTime.parse(getExpiryDate);
+                            final dateNow = DateTime.now();
+                            dayDifference = daysBetween(dateNow, expDate);
 
-                          var expiryDateStatus = dayDifference <= 0
-                              ? 'Expiry Date: $getExpiryDate'
-                              : '$dayDifference day/s left.';
+                            //*EXPIRY DATE
+                            var expiryMessage = dayDifference <= 0
+                                ? '$name has expired'
+                                : dayDifference > 30
+                                    ? ''
+                                    : '$name will be expiring at $getExpiryDate';
 
-                          //*QUANTITY
-                          var quantityMessage = quantity > 10
-                              ? ''
-                              : '$name needs to be restocked.';
-                          var quantityStatus =
-                              quantity > 10 ? '' : 'Item/s left: $quantity';
+                            var expiryDateStatus = dayDifference <= 0
+                                ? 'Expiry Date: $getExpiryDate'
+                                : dayDifference > 30
+                                    ? ''
+                                    : '$dayDifference day/s left.';
 
-                          if (quantity <= 10) {
+                            //*QUANTITY
+                            var quantityMessage = quantity > 10
+                                ? ''
+                                : '$name needs to be restocked.';
+                            var quantityStatus =
+                                quantity > 10 ? '' : 'Item/s left: $quantity';
+
                             _notificationService.notificationsPlugin
                                 .show(
                               uniqueID,
@@ -359,9 +371,11 @@ class _ProductsState extends State<Products> {
                                   quantityStatus: quantityStatus,
                                   id: data.id,
                                 );
-                              } else {
-                                await ndb.deleteNotif(id: data.id);
                               }
+                            });
+                          } else {
+                            Future.delayed(Duration(seconds: 1), () async {
+                              await ndb.deleteNotif(id: data.id);
                             });
                           }
 

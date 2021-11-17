@@ -49,15 +49,15 @@ class _ProductAddState extends State<ProductAdd> {
   String dateMonth = DateFormat('MMMM').format(DateTime.now()); //*GET MONTH
 
   final List<String> productTypes = [
+    'Appliances',
     'Clothing',
-    'Food',
     'Drinks',
     'Equipments',
-    'Sports',
-    'Technology',
-    'Appliances',
+    'Food',
     'Games',
     'Shoes',
+    'Sports',
+    'Technology',
     'Others',
   ];
   String? value;
@@ -65,6 +65,9 @@ class _ProductAddState extends State<ProductAdd> {
   @override
   void initState() {
     _barcodeController.text = widget.getBarcode!;
+    if (_barcodeController.text != "") {
+      _quantityController.text = '1';
+    }
     super.initState();
   }
 
@@ -276,6 +279,9 @@ class _ProductAddState extends State<ProductAdd> {
       setState(() {
         this.scanResult = scanResult;
         _barcodeController.text = this.scanResult!;
+        if (_barcodeController.text != "") {
+          _quantityController.text = '1';
+        }
       });
     } else {
       setState(() {
@@ -393,9 +399,12 @@ class _ProductAddState extends State<ProductAdd> {
       prefixIcon: Icons.calendar_today_outlined,
       hintText: 'Expiration Date',
       labelText: 'Expiration Date',
-      suffixIcon: null,
+      suffixIcon: Icons.close,
       keyboardType: TextInputType.datetime,
       textInputAction: TextInputAction.next,
+      suffixIconOnPressed: () {
+        _expiryDateController.clear();
+      },
       onTap: () {
         FocusScope.of(context).requestFocus(new FocusNode());
         setState(() {

@@ -35,6 +35,28 @@ class NotificationDB {
     }
   }
 
+  //*INSERT NOTIF TO DB
+  Future<void> updateNotif({
+    required String expiryMessage,
+    required String expiryDateStatus,
+    required String quantityMessage,
+    required String quantityStatus,
+    required String id,
+    required String productId,
+  }) async {
+    try {
+      await notificationCollection.doc(id).update({
+        'productId': productId,
+        'expiryMessage': expiryMessage,
+        'expiryDateStatus': expiryDateStatus,
+        'quantityMessage': quantityMessage,
+        'quantityStatus': quantityStatus,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> deleteNotif({
     required String id,
   }) async {

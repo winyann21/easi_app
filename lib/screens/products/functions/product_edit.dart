@@ -63,15 +63,15 @@ class _ProductEditState extends State<ProductEdit> {
   String productId = '';
 
   final List<String> productTypes = [
+    'Appliances',
     'Clothing',
-    'Food',
     'Drinks',
     'Equipments',
-    'Sports',
-    'Technology',
-    'Appliances',
+    'Food',
     'Games',
     'Shoes',
+    'Sports',
+    'Technology',
     'Others',
   ];
   String? pType;
@@ -122,6 +122,43 @@ class _ProductEditState extends State<ProductEdit> {
         appBar: AppBar(
           elevation: 0.0,
           backgroundColor: Colors.white,
+          actions: [
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(
+                      'Delete Product',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    content: Text('Are you sure you want to delete this item?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          db.deleteProduct(id: productId);
+                          Navigator.pop(context, true);
+                          Navigator.pop(context, true);
+                          showToast(msg: 'Product Deleted');
+                        },
+                        child: Text('Yes'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: Text('No'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icon(Icons.delete),
+            ),
+          ],
         ),
         backgroundColor: Colors.white,
         body: Center(
@@ -428,9 +465,12 @@ class _ProductEditState extends State<ProductEdit> {
       prefixIcon: Icons.calendar_today_outlined,
       hintText: 'Expiration Date',
       labelText: 'Expiration Date',
-      suffixIcon: null,
+      suffixIcon: Icons.close,
       keyboardType: TextInputType.datetime,
       textInputAction: TextInputAction.next,
+      suffixIconOnPressed: () {
+        _expiryDateController.clear();
+      },
       onTap: () {
         FocusScope.of(context).requestFocus(new FocusNode());
         setState(() {
