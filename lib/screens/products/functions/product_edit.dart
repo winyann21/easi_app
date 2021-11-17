@@ -1,9 +1,10 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print
+// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print, await_only_futures
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/product_database.dart';
+import 'package:easi/services/sales_database.dart';
 import 'package:easi/utils/product_validations.dart';
 import 'package:easi/widgets/app_textformfield.dart';
 import 'package:easi/widgets/app_toast.dart';
@@ -48,6 +49,7 @@ class _ProductEditState extends State<ProductEdit> {
   DateTime? date;
 
   final ProductDB db = ProductDB();
+  final SalesDB sdb = SalesDB();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -61,6 +63,7 @@ class _ProductEditState extends State<ProductEdit> {
   String barcode = '';
   String photoUrl = '';
   String productId = '';
+  String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
   final List<String> productTypes = [
     'Appliances',
@@ -138,7 +141,25 @@ class _ProductEditState extends State<ProductEdit> {
                     content: Text('Are you sure you want to delete this item?'),
                     actions: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          double totalToDeduct =
+                              widget.data!.get('numOfItemSold') *
+                                  widget.data!.get('price');
+                          double totalSales;
+                          var sales =
+                              await sdb.salesCollection.doc(dateMonth).get();
+                          //*ELSE(UPDATE DOC)
+                          var salesDS =
+                              await sdb.salesCollection.doc(dateMonth);
+                          if (sales.exists) {
+                            salesDS.get().then((doc) async {
+                              totalSales = doc.get('totalSales');
+                              await sdb.updateSales(
+                                month: dateMonth,
+                                totalSales: totalSales - totalToDeduct,
+                              );
+                            });
+                          }
                           db.deleteProduct(id: productId);
                           Navigator.pop(context, true);
                           Navigator.pop(context, true);

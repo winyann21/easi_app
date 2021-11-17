@@ -21,14 +21,12 @@ class Purchase extends StatefulWidget {
 }
 
 class _PurchaseState extends State<Purchase> {
-  final LocalNotificationService _notificationService =
-      LocalNotificationService();
   final ProductDB db = ProductDB();
   final SalesDB sdb = SalesDB();
 
   final _purchaseFormKey = GlobalKey<FormState>();
-  TextEditingController _newQuantity = new TextEditingController();
-  TextEditingController _enterCash = new TextEditingController();
+  final TextEditingController _newQuantity = new TextEditingController();
+  final TextEditingController _enterCash = new TextEditingController();
   double? total;
   double totalPrice = 1.0;
   double? totalPriceItemSold;

@@ -127,7 +127,6 @@ class _ProductsState extends State<Products> {
                     actions: [
                       TextButton(
                         onPressed: () async {
-                          //!IF NO DATA SHOW NO DATA
                           //*PDF GENERATE
                           //*INITIALIZE VARIABLES
                           var invoice;
@@ -137,28 +136,32 @@ class _ProductsState extends State<Products> {
                               .orderBy('numOfItemSold', descending: true)
                               .get()
                               .then((querySnapshot) {
-                            querySnapshot.docs.forEach((doc) async {
-                              invoice = Invoice(
-                                items: querySnapshot.docs,
-                              );
+                            if (querySnapshot.docs.isEmpty) {
+                              showToast(msg: 'No data to generate');
+                            } else {
+                              querySnapshot.docs.forEach((doc) async {
+                                invoice = Invoice(
+                                  items: querySnapshot.docs,
+                                );
 
-                              pdfFile = await PdfInvoiceApi.generate(invoice);
-                              PdfApi.openFile(pdfFile);
+                                pdfFile = await PdfInvoiceApi.generate(invoice);
+                                PdfApi.openFile(pdfFile);
 
-                              //!CAN BE CHANGED
-                              // //*RESET ITEMSOLD
-                              // await db.resetItemSold(
-                              //   id: doc.id,
-                              //   numOfItemSold: 0,
-                              // );
+                                //!CAN BE CHANGED
+                                // //*RESET ITEMSOLD
+                                // await db.resetItemSold(
+                                //   id: doc.id,
+                                //   numOfItemSold: 0,
+                                // );
 
-                              // //*RESET TOTAL SALES THIS MONTH
-                              // await sdb.updateSales(
-                              //   totalSales: 0.00,
-                              //   month: dateMonth,
-                              // );
-                              //*********************!
-                            });
+                                // //*RESET TOTAL SALES THIS MONTH
+                                // await sdb.updateSales(
+                                //   totalSales: 0.00,
+                                //   month: dateMonth,
+                                // );
+                                //*********************!
+                              });
+                            }
                           });
 
                           Navigator.pop(context, true);
@@ -234,7 +237,7 @@ class _ProductsState extends State<Products> {
                   );
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
-                    child: Text('No data'),
+                    child: Text('List is currently empty, try adding items.'),
                   );
                 } else {
                   return ListView(
@@ -259,6 +262,7 @@ class _ProductsState extends State<Products> {
                           final int quantity = data.get('quantity');
                           final String photoURL = data.get('photoURL');
                           final String productId = data.id;
+                          final int numOfItemSold = data.get('numOfItemSold');
 
                           //*GET TIMESTAMP DATEADDED FIELD
                           Timestamp time =
@@ -279,7 +283,7 @@ class _ProductsState extends State<Products> {
                           final dateNow = DateTime.now();
                           final expDate = DateTime.parse(
                             getExpiryDate == ""
-                                ? dateNow.toString()
+                                ? getDateNow.toString()
                                 : getExpiryDate,
                           );
                           dayDifference = daysBetween(dateNow, expDate);
@@ -330,7 +334,11 @@ class _ProductsState extends State<Products> {
                               }
                             });
                           } else if (quantity <= 10) {
-                            final expDate = DateTime.parse(getExpiryDate);
+                            final expDate = DateTime.parse(
+                              getExpiryDate == ""
+                                  ? getDateNow.toString()
+                                  : getExpiryDate,
+                            );
                             final dateNow = DateTime.now();
                             dayDifference = daysBetween(dateNow, expDate);
 
@@ -412,7 +420,31 @@ class _ProductsState extends State<Products> {
                                             'Are you sure you want to delete this item?'),
                                         actions: [
                                           TextButton(
-                                            onPressed: () {
+                                            onPressed: () async {
+                                              double totalToDeduct =
+                                                  numOfItemSold * price;
+                                              double totalSales;
+                                              var sales = await sdb
+                                                  .salesCollection
+                                                  .doc(dateMonth)
+                                                  .get();
+                                              //*ELSE(UPDATE DOC)
+                                              // ignore: await_only_futures
+                                              var salesDS = await sdb
+                                                  .salesCollection
+                                                  .doc(dateMonth);
+                                              if (sales.exists) {
+                                                salesDS.get().then((doc) async {
+                                                  totalSales =
+                                                      doc.get('totalSales');
+                                                  await sdb.updateSales(
+                                                    month: dateMonth,
+                                                    totalSales: totalSales -
+                                                        totalToDeduct,
+                                                  );
+                                                });
+                                              }
+
                                               db.deleteProduct(id: data.id);
                                               Navigator.pop(context, true);
                                               showToast(msg: 'Product Deleted');

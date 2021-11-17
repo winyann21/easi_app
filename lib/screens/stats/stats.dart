@@ -20,7 +20,7 @@ class _StatsState extends State<Stats> {
   static final _authController = Get.find<AuthController>(); //user data
   final SalesDB sdb = SalesDB();
   final ProductDB db = ProductDB();
-  
+
   final CollectionReference _salesCollection = FirebaseFirestore.instance
       .collection('users')
       .doc(_authController.user!.uid)
@@ -103,7 +103,7 @@ class _StatsState extends State<Stats> {
                           if (!snapshot.hasData ||
                               snapshot.data!.docs.isEmpty) {
                             return Center(
-                              child: Text('No data'),
+                              child: Text('No data yet'),
                             );
                           } else {
                             return Column(
@@ -119,10 +119,10 @@ class _StatsState extends State<Stats> {
                                       padding: const EdgeInsets.all(24.0),
                                       child: numOfItemSold == 0
                                           ? Center(
-                                              child: Text('No data'),
+                                              child: Text(
+                                                  'No marketable item yet.'),
                                             )
                                           : Card(
-                                            
                                               margin: EdgeInsets.fromLTRB(
                                                   4, 2, 4, 2),
                                               child: Padding(
