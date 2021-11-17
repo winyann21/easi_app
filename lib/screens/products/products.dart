@@ -333,45 +333,47 @@ class _ProductsState extends State<Products> {
                           var quantityStatus =
                               quantity > 10 ? '' : 'Item/s left: $quantity';
                           //CAN ADD DURATION IF NEEDED
-
                           if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
-
-                            _notificationService.notificationsPlugin
-                                .schedule(
-                              uniqueID,
-                              expiryMessage,
-                              expiryDateStatus,
-                              duration,
-                              _notificationService.notificationDetails,
-                            )
-                                .whenComplete(() async {
-                              await ndb.addNotif(
-                                productId: productId,
-                                expiryMessage: expiryMessage,
-                                expiryDateStatus: expiryDateStatus,
-                                quantityMessage: quantityMessage,
-                                quantityStatus: quantityStatus,
-                                id: data.id,
-                              );
+                            Future.delayed(Duration(minutes: 5), () {
+                              _notificationService.notificationsPlugin
+                                  .schedule(
+                                uniqueID,
+                                '$expiryMessage. $quantityMessage',
+                                '$expiryDateStatus. $quantityStatus',
+                                duration,
+                                _notificationService.notificationDetails,
+                              )
+                                  .whenComplete(() async {
+                                await ndb.addNotif(
+                                  productId: productId,
+                                  expiryMessage: expiryMessage,
+                                  expiryDateStatus: expiryDateStatus,
+                                  quantityMessage: quantityMessage,
+                                  quantityStatus: quantityStatus,
+                                  id: data.id,
+                                );
+                              });
                             });
                           } else if (quantity <= 10) {
-                            _notificationService.notificationsPlugin
-                                .show(
-                              uniqueID,
-                              quantityMessage,
-                              quantityStatus,
-                              _notificationService.notificationDetails,
-                            )
-                                .whenComplete(() async {
-                              await ndb.addNotif(
-                                productId: productId,
-                                expiryMessage: expiryMessage,
-                                expiryDateStatus: expiryDateStatus,
-                                quantityMessage: quantityMessage,
-                                quantityStatus: quantityStatus,
-                                id: data.id,
-                              );
+                            Future.delayed(Duration(minutes: 2), () {
+                              _notificationService.notificationsPlugin
+                                  .show(
+                                uniqueID,
+                                '$expiryMessage. $quantityMessage',
+                                '$expiryDateStatus. $quantityStatus',
+                                _notificationService.notificationDetails,
+                              )
+                                  .whenComplete(() async {
+                                await ndb.addNotif(
+                                  productId: productId,
+                                  expiryMessage: expiryMessage,
+                                  expiryDateStatus: expiryDateStatus,
+                                  quantityMessage: quantityMessage,
+                                  quantityStatus: quantityStatus,
+                                  id: data.id,
+                                );
+                              });
                             });
                           } else {
                             Future.delayed(Duration(seconds: 1), () async {
