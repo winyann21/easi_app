@@ -38,6 +38,8 @@ class AuthController extends GetxController {
       GoogleSignInAuthentication _googleAuth =
           await _googleUser!.authentication;
 
+      //!PROMPT DIALOG WITH OTP TO PROCEED
+
       final AuthCredential _authCredential = GoogleAuthProvider.credential(
         accessToken: _googleAuth.accessToken,
         idToken: _googleAuth.idToken,

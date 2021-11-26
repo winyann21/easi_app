@@ -9,6 +9,7 @@ import 'package:easi/screens/products/products.dart';
 import 'package:easi/screens/profile_drawer/drawer_screen.dart';
 import 'package:easi/screens/purchase/purchase.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
+import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/screens/stats/stats.dart';
 import 'package:easi/services/user_database.dart';
 import 'package:easi/widgets/app_elevatedbutton.dart';
@@ -85,7 +86,7 @@ class _HomeState extends State<Home> {
           color: Colors.white,
         ),
         onPressed: () {
-          showSearch(context: context, delegate: PurchaseSearch());
+          Get.to(() => PurchasedItems());
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

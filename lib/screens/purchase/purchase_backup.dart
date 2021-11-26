@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables
+// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers
 
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +6,6 @@ import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/services/local_notification.dart';
 //import 'package:easi/services/database/sales_database.dart';
 import 'package:easi/services/product_database.dart';
-import 'package:easi/services/purchased_items.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_textformfield.dart';
 import 'package:easi/widgets/app_toast.dart';
@@ -26,11 +25,10 @@ class Purchase extends StatefulWidget {
 class _PurchaseState extends State<Purchase> {
   final ProductDB db = ProductDB();
   final SalesDB sdb = SalesDB();
-  final PurchasedItemsDB pidb = PurchasedItemsDB();
 
   final _purchaseFormKey = GlobalKey<FormState>();
   final TextEditingController _newQuantity = new TextEditingController();
-  // final TextEditingController _enterCash = new TextEditingController();
+  final TextEditingController _enterCash = new TextEditingController();
   double? total;
   double totalPrice = 1.0;
   double? totalPriceItemSold;
@@ -77,17 +75,17 @@ class _PurchaseState extends State<Purchase> {
         appBar: AppBar(
           centerTitle: true,
           title: Text('Purchase Item'),
-          // actions: [
-          //   IconButton(
-          //     onPressed: () {
-          //       Get.back();
-          //       Get.to(() => PurchasedItems());
-          //     },
-          //     icon: Icon(
-          //       Icons.receipt_sharp,
-          //     ),
-          //   ),
-          // ],
+          actions: [
+            IconButton(
+              onPressed: () {
+                Get.back();
+                Get.to(() => PurchasedItems());
+              },
+              icon: Icon(
+                Icons.receipt_sharp,
+              ),
+            ),
+          ],
         ),
         floatingActionButton: purchaseBtn(),
         body: Center(
@@ -193,7 +191,8 @@ class _PurchaseState extends State<Purchase> {
                             ),
                           ],
                         ),
-                        // enterCash(),
+                        SizedBox(height: 10.0),
+                        enterCash(),
                         SizedBox(height: 10.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -274,102 +273,96 @@ class _PurchaseState extends State<Purchase> {
     );
   }
 
-  // Widget enterCash() {
-  //   return RoundRectTextFormField(
-  //     controller: _enterCash,
-  //     prefixIcon: Icons.attach_money_sharp,
-  //     hintText: 'Enter Cash',
-  //     labelText: 'Cash',
-  //     suffixIcon: null,
-  //     keyboardType: TextInputType.number,
-  //     textInputAction: TextInputAction.next,
-  //     validator: (value) {
-  //       if (value!.isEmpty) {
-  //         return "Field is required";
-  //       } else if (double.parse(value) < double.parse(total.toString())) {
-  //         return "Not enough cash";
-  //       } else {
-  //         return null;
-  //       }
-  //     },
-  //   );
-  // }
+  Widget enterCash() {
+    return RoundRectTextFormField(
+      controller: _enterCash,
+      prefixIcon: Icons.attach_money_sharp,
+      hintText: 'Enter Cash',
+      labelText: 'Cash',
+      suffixIcon: null,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Field is required";
+        } else if (double.parse(value) < double.parse(total.toString())) {
+          return "Not enough cash";
+        } else {
+          return null;
+        }
+      },
+    );
+  }
 
   Widget purchaseBtn() {
     return FloatingActionButton(
       onPressed: () async {
         if (_purchaseFormKey.currentState!.validate()) {
+          String id = widget.data!.id; //*DOCUMENT ID
+          int amount =
+              int.parse(_newQuantity.text); //*SUBTRACT TO PRODUCT'S QUANTITY
+          double change =
+              (double.parse(_enterCash.text) - double.parse(total.toString()));
+
+          double newChange = double.parse(
+              change.toStringAsFixed(2)); //*formatted to 2 decimal places
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
               title: Text(
-                'Purchase item?',
+                'Confirm Purchase',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey[800],
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              content: change <= 0
+                  ? Text('No Change')
+                  : Text('Change: $newChange'), //*CHANGE
               actions: [
                 TextButton(
                   onPressed: () async {
-                    //TODO:: DO ADD TO PURCHASED ITEMS SECTION
-                    String id = widget.data!.id; //*DOCUMENT ID
-                    int amount = int.parse(_newQuantity.text);
+                    //*GENERATE RANDOM ID FOR NOTIFICATIONS
+
+                    //*COMPUTATION FOR QUANTITY, TOTAL PRICE AND NUMBER OF ITEM SOLD
                     itemSold = (itemSold! + amount);
-                    // quantity = (quantity! - amount);
+                    quantity = (quantity! - amount);
                     totalPriceItemSold = (price! * amount);
 
-                    await pidb.addPurchasedItems(
+                    //*UPDATE PRODUCT PURCHASE
+                    await db.purchaseProduct(
                       id: id,
-                      name: name,
-                      quantity: itemSold!,
-                      totalPrice: totalPriceItemSold!,
+                      quantity: quantity!,
+                      numOfItemSold: itemSold!,
                     );
 
-                    showToast(msg: "Item Added");
+                    //*ADD TO TOTAL SALES THIS MONTH
+                    //*CHECK IF MONTH EXISTS(IF NOT CREATE DOC)
+                    var sales = await sdb.salesCollection.doc(dateMonth).get();
+                    if (!sales.exists) {
+                      sdb.addSales(
+                        totalSales: totalPriceItemSold!,
+                        month: dateMonth,
+                      );
+                    }
+
+                    //*ELSE(UPDATE DOC)
+                    // ignore: await_only_futures
+                    var salesDS = await sdb.salesCollection.doc(dateMonth);
+                    if (sales.exists) {
+                      salesDS.get().then((doc) async {
+                        totalSales = doc.get('totalSales');
+                        await sdb.updateSales(
+                          month: dateMonth,
+                          totalSales: totalSales! + totalPriceItemSold!,
+                        );
+                      });
+                    }
+
+                    showToast(msg: "Item Purchased");
                     Navigator.pop(context);
-
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          'Add more items?',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[800],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                            },
-                            child: Text(
-                              'Yes',
-                              style: TextStyle(
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                            },
-                            child: Text(
-                              'No',
-                              style: TextStyle(
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    Navigator.pop(context);
                   },
                   child: Text(
                     'Yes',
@@ -380,8 +373,6 @@ class _PurchaseState extends State<Purchase> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context, true);
-                    Navigator.pop(context, true);
                     Navigator.pop(context, true);
                   },
                   child: Text(

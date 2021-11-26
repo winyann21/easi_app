@@ -335,7 +335,7 @@ class _ProductsState extends State<Products> {
                           //CAN ADD DURATION IF NEEDED
                           if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
-                            Future.delayed(Duration(minutes: 5), () {
+                            Future.delayed(Duration(minutes: 15), () {
                               _notificationService.notificationsPlugin
                                   .schedule(
                                 uniqueID,
@@ -356,7 +356,7 @@ class _ProductsState extends State<Products> {
                               });
                             });
                           } else if (quantity <= 10) {
-                            Future.delayed(Duration(minutes: 2), () {
+                            Future.delayed(Duration(minutes: 15), () {
                               _notificationService.notificationsPlugin
                                   .show(
                                 uniqueID,

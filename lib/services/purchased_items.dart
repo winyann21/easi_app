@@ -5,37 +5,38 @@ import 'package:easi/controllers/auth_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class SalesDB {
+class PurchasedItemsDB {
   final _authController = Get.find<AuthController>(); //user data
-  late CollectionReference salesCollection = FirebaseFirestore.instance
+  late CollectionReference purchasedItemsCollection = FirebaseFirestore.instance
       .collection('users')
       .doc(_authController.user!.uid)
-      .collection('sales');
+      .collection('purchasedItems');
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
   //*ADD SALES
-  Future<void> addSales({
-    required double totalSales,
-    required String month,
+  Future<void> addPurchasedItems({
+    required String id,
+    required String name,
+    required int quantity,
+    required double totalPrice,
   }) async {
     try {
-      await salesCollection.doc(month).set({
-        'totalSales': totalSales,
-        'month': month,
+      await purchasedItemsCollection.add({
+        'id': id,
+        'name': name,
+        'quantity': quantity,
+        'totalPrice': totalPrice,
       });
     } catch (e) {
       print(e);
     }
   }
 
-  Future<void> updateSales({
-    required double totalSales,
-    required String month,
+  Future<void> deletePurchasedItems({
+    required String id,
   }) async {
     try {
-      await salesCollection.doc(month).update({
-        'totalSales': totalSales,
-      });
+      await purchasedItemsCollection.doc(id).delete();
     } catch (e) {
       print(e);
     }
