@@ -5,6 +5,7 @@ import 'package:easi/controllers/user_controller.dart';
 import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
+import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/services/user_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -63,8 +64,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                             menuName: 'Purchase Product',
                             menuIcon: Icons.shopping_basket_sharp,
                             onClicked: () {
-                              showSearch(
-                                  context: context, delegate: PurchaseSearch());
+                              Get.to(() => PurchasedItems());
                             },
                           ),
                           //*ADD PRODUCT
