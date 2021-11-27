@@ -11,20 +11,50 @@ class PurchasedItemsDB {
       .collection('users')
       .doc(_authController.user!.uid)
       .collection('purchasedItems');
+      
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
   //*ADD SALES
   Future<void> addPurchasedItems({
     required String id,
     required String name,
+    required int quantitySold,
     required int quantity,
+    required int currentItemSold,
+    required double price,
     required double totalPrice,
   }) async {
     try {
-      await purchasedItemsCollection.add({
+      await purchasedItemsCollection.doc(id).set({
         'id': id,
         'name': name,
         'quantity': quantity,
+        'quantitySold': quantitySold,
+        'currentItemSold': currentItemSold,
+        'price': price,
+        'totalPrice': totalPrice,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+  Future<void> updatePurchasedItems({
+    required String id,
+    required String name,
+    required int quantitySold,
+    required int quantity,
+    required int currentItemSold,
+    required double price,
+    required double totalPrice,
+  }) async {
+    try {
+      await purchasedItemsCollection.doc(id).update({
+        'id': id,
+        'name': name,
+        'quantity': quantity,
+        'quantitySold': quantitySold,
+        'currentItemSold': currentItemSold,
+        'price': price,
         'totalPrice': totalPrice,
       });
     } catch (e) {

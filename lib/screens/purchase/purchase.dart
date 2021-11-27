@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables
+// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, unused_local_variable, await_only_futures, duplicate_ignore
 
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +6,7 @@ import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/services/local_notification.dart';
 //import 'package:easi/services/database/sales_database.dart';
 import 'package:easi/services/product_database.dart';
-import 'package:easi/services/purchased_items.dart';
+import 'package:easi/services/purchased_items_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_textformfield.dart';
 import 'package:easi/widgets/app_toast.dart';
@@ -44,6 +44,9 @@ class _PurchaseState extends State<Purchase> {
   double? totalPriceOfItemSold;
   double? totalSales;
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
+
+  int? newQS;
+  double? totPrice;
 
   @override
   void initState() {
@@ -316,16 +319,40 @@ class _PurchaseState extends State<Purchase> {
                     //TODO:: DO ADD TO PURCHASED ITEMS SECTION
                     String id = widget.data!.id; //*DOCUMENT ID
                     int amount = int.parse(_newQuantity.text);
-                    itemSold = (itemSold! + amount);
+                    // itemSold = (itemSold! + amount);
                     // quantity = (quantity! - amount);
                     totalPriceItemSold = (price! * amount);
 
-                    await pidb.addPurchasedItems(
-                      id: id,
-                      name: name,
-                      quantity: itemSold!,
-                      totalPrice: totalPriceItemSold!,
-                    );
+                    var pItems =
+                        await pidb.purchasedItemsCollection.doc(id).get();
+                    if (!pItems.exists) {
+                      await pidb.addPurchasedItems(
+                        id: id,
+                        name: name,
+                        currentItemSold: itemSold!,
+                        quantitySold: amount,
+                        quantity: quantity!,
+                        price: price!,
+                        totalPrice: totalPriceItemSold!,
+                      );
+                    }
+                    var pItemsDS = await pidb.purchasedItemsCollection.doc(id);
+                    if (pItems.exists) {
+                      pItemsDS.get().then((doc) async {
+                        newQS = doc.get('quantitySold');
+                        totPrice = doc.get('totalPrice');
+
+                        await pidb.updatePurchasedItems(
+                          id: id,
+                          name: name,
+                          currentItemSold: itemSold!,
+                          quantitySold: newQS! + amount,
+                          quantity: quantity!,
+                          price: price!,
+                          totalPrice: totPrice! + totalPriceItemSold!,
+                        );
+                      });
+                    }
 
                     showToast(msg: "Item Added");
                     Navigator.pop(context);
