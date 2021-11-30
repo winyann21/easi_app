@@ -36,7 +36,11 @@ class _PurchasedItemsState extends State<PurchasedItems> {
       .doc(_authController.user!.uid)
       .collection('products');
   final TextEditingController _enterCash = TextEditingController();
-  String dateMonth = DateFormat('MMMM').format(DateTime.now());
+
+  double? totalSales;
+  var date = DateTime.now().add(Duration(hours: 8));
+  late String dateMonth = DateFormat('MMMM').format(date);
+
   @override
   void dispose() {
     super.dispose();
@@ -210,10 +214,10 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         .doc(dateMonth)
                                         .get();
                                     if (!sales.exists) {
-                                      // sdb.addSales(
-                                      //   totalSales: totalPriceItemSold!,
-                                      //   month: dateMonth,
-                                      // );
+                                      sdb.addSales(
+                                        totalSales: pSum,
+                                        month: dateMonth,
+                                      );
                                     }
 
                                     //*ELSE(UPDATE DOC)
@@ -222,11 +226,11 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         .doc(dateMonth);
                                     if (sales.exists) {
                                       salesDS.get().then((doc) async {
-                                        // totalSales = doc.get('totalSales');
-                                        // await sdb.updateSales(
-                                        //   month: dateMonth,
-                                        //   totalSales: totalSales! + totalPriceItemSold!,
-                                        // );
+                                        totalSales = doc.get('totalSales');
+                                        await sdb.updateSales(
+                                          month: dateMonth,
+                                          totalSales: totalSales! + pSum,
+                                        );
                                       });
                                     }
 

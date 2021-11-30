@@ -31,7 +31,8 @@ class _StatsState extends State<Stats> {
       .doc(_authController.user!.uid)
       .collection('products');
 
-  String dateMonth = DateFormat('MMMM').format(DateTime.now());
+  var date = DateTime.now().add(Duration(hours: 8));
+  late String dateMonth = DateFormat('MMMM').format(date);
 
   @override
   void initState() {

@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
@@ -11,7 +11,8 @@ class SalesDB {
       .collection('users')
       .doc(_authController.user!.uid)
       .collection('sales');
-  String dateMonth = DateFormat('MMMM').format(DateTime.now());
+  var date = DateTime.now().add(Duration(hours: 8));
+  late String dateMonth = DateFormat('MMMM').format(date);
 
   //*ADD SALES
   Future<void> addSales({
