@@ -11,8 +11,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
 
 class PdfInvoiceApi {
-  static String dateMonth = DateFormat('MMMM').format(DateTime.now());
-  static String date = DateFormat('MMMM-dd-yyyy').format(DateTime.now());
+  static String date =
+      DateFormat('MMMM-dd-yyyy').format(DateTime.now().add(Duration(hours: 8)));
+  static var dateNow = DateTime.now().add(Duration(hours: 8));
+  static String dateMonth = DateFormat('MMMM').format(dateNow);
   static Future<File> generate(Invoice invoice) async {
     final pdf = Document();
 

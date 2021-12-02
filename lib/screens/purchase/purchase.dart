@@ -43,6 +43,9 @@ class _PurchaseState extends State<Purchase> {
   int? itemSold;
   double? totalPriceOfItemSold;
   double? totalSales;
+  String expiryDate = '';
+  Timestamp? dateCreated;
+  String category = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
   int? newQS;
@@ -58,6 +61,14 @@ class _PurchaseState extends State<Purchase> {
     quantity = widget.data!.get('quantity');
     price = widget.data!.get('price');
     itemSold = widget.data!.get('numOfItemSold');
+    expiryDate = widget.data!.get('expiryDate');
+    dateCreated = widget.data!.get('dateAdded') ?? Timestamp.now();
+    category = widget.data!.get('category');
+
+    //for string conversion
+    // DateTime date =
+    //     DateTime.fromMicrosecondsSinceEpoch(time!.microsecondsSinceEpoch);
+    // dateCreated = DateFormat('MM-dd-yyyy').format(date);
 
     _newQuantity.addListener(totalPriceListener);
     _newQuantity.text = "1";
@@ -327,13 +338,17 @@ class _PurchaseState extends State<Purchase> {
                         await pidb.purchasedItemsCollection.doc(id).get();
                     if (!pItems.exists) {
                       await pidb.addPurchasedItems(
+                        dateCreated: dateCreated!,
+                        barcode: barcode,
                         id: id,
                         name: name,
+                        category: category,
                         currentItemSold: itemSold!,
                         quantitySold: amount,
                         quantity: quantity!,
                         price: price!,
                         totalPrice: totalPriceItemSold!,
+                        expiryDate: expiryDate,
                       );
                     }
                     var pItemsDS = await pidb.purchasedItemsCollection.doc(id);
@@ -345,7 +360,11 @@ class _PurchaseState extends State<Purchase> {
                         await pidb.updatePurchasedItems(
                           id: id,
                           name: name,
+                          barcode: barcode,
+                          category: category,
+                          dateCreated: dateCreated!,
                           currentItemSold: itemSold!,
+                          expiryDate: expiryDate,
                           quantitySold: newQS! + amount,
                           quantity: quantity!,
                           price: price!,

@@ -4,6 +4,7 @@ import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/controllers/user_controller.dart';
 import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
+import 'package:easi/screens/products/product_details.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
 import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/services/user_database.dart';
@@ -50,6 +51,14 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       child: Column(
                         children: [
                           Divider(color: Colors.grey[850]),
+                          const SizedBox(height: 16),
+                          buildMenuItem(
+                            menuName: 'Product Details',
+                            menuIcon: Icons.details,
+                            onClicked: () {
+                              Get.to(() => ProductDetails());
+                            },
+                          ),
                           const SizedBox(height: 16),
                           buildMenuItem(
                             menuName: 'Search Product',

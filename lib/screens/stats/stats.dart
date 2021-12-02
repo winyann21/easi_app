@@ -87,13 +87,22 @@ class _StatsState extends State<Stats> {
 
                       //*TOTAL SALES
                       Text('Total Sales'),
-                      Text(
-                        totalSales.toStringAsFixed(2),
-                        style: TextStyle(
-                          fontSize: 26.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      totalSales < 0
+                          ? Text(
+                              '0.00',
+                              style: TextStyle(
+                                fontSize: 26.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )
+                          : Text(
+                              totalSales.toStringAsFixed(2),
+                              style: TextStyle(
+                                fontSize: 26.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
                       StreamBuilder(
                         stream: _productCollection
                             .orderBy('numOfItemSold', descending: true)

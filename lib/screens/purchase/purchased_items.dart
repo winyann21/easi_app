@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_function_literals_in_foreach_calls
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_function_literals_in_foreach_calls, await_only_futures
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
@@ -40,6 +40,9 @@ class _PurchasedItemsState extends State<PurchasedItems> {
   double? totalSales;
   var date = DateTime.now().add(Duration(hours: 8));
   late String dateMonth = DateFormat('MMMM').format(date);
+
+  int? itemQuantity;
+  int? numOfItemSold;
 
   @override
   void dispose() {
@@ -178,6 +181,12 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                   onPressed: () async {
                                     //*UPDATE DATABASES
                                     String? pId;
+                                    String? name;
+                                    String? barcode;
+                                    String? category;
+                                    Timestamp? dateCreated;
+                                    String? expiryDate;
+                                    double? price;
                                     int? pQuantitySold;
                                     int? quantity;
                                     int? currentItemSold;
@@ -187,7 +196,13 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         .then((snapshot) {
                                       snapshot.docs.forEach((item) async {
                                         pId = item.get('id');
+                                        name = item.get('name');
+                                        barcode = item.get('barcode');
+                                        category = item.get('category');
+                                        dateCreated = item.get('dateCreated');
+                                        expiryDate = item.get('expiryDate');
                                         quantity = item.get('quantity');
+                                        price = item.get('price');
                                         pQuantitySold =
                                             item.get('quantitySold');
                                         currentItemSold =
@@ -197,13 +212,14 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                             currentItemSold! + pQuantitySold!;
                                         quantity = quantity! - pQuantitySold!;
 
+                                        //UPDATE PRODUCT DETAILS
                                         await db.purchaseProduct(
                                           id: pId!,
                                           quantity: quantity!,
                                           numOfItemSold: currentItemSold!,
                                         );
-                                        //AFTER CLEAR ALL DB
 
+                                        //AFTER, CLEAR ALL DB
                                         item.reference.delete();
                                       });
                                     });
@@ -233,7 +249,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         );
                                       });
                                     }
-
+                                    showToast(msg: 'Purchase Success');
                                     Navigator.pop(context, true);
                                     _enterCash.clear();
                                   },

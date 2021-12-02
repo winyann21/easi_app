@@ -46,8 +46,9 @@ class _ProductsState extends State<Products> {
   String? scanResult;
   String barcode = '';
   String getBarcode = '';
-  String dateMonth = DateFormat('MMMM').format(DateTime.now());
-  String dateNow = DateFormat('MM-dd-yyyy').format(DateTime.now());
+
+  var date = DateTime.now().add(Duration(hours: 8));
+  late String dateMonth = DateFormat('MMMM').format(date);
 
   final List<String> productCategories = [
     'All',
@@ -68,6 +69,7 @@ class _ProductsState extends State<Products> {
   void initState() {
     super.initState();
     category = productCategories[0]; //* ALWAYS ALL CATEGORIES
+    //*IF DATEMONTH IS NOT EQUAL TO DATE NOW
   }
 
   @override

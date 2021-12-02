@@ -29,6 +29,68 @@ class SalesDB {
     }
   }
 
+  // Future<void> addItemSoldThisMonth({
+  //   required String month,
+  //   required String itemId,
+  //   required String name,
+  //   required String barcode,
+  //   required String category,
+  //   required Timestamp dateCreated,
+  //   required int itemQuantity,
+  //   required int numOfItemSold,
+  //   required String expiryDate,
+  //   required double price,
+  // }) async {
+  //   try {
+  //     await salesCollection.doc(month).collection('itemsSold').doc(itemId).set({
+  //       'name': name,
+  //       'barcode': barcode,
+  //       'category': category,
+  //       'dateCreated': dateCreated,
+  //       'expiryDate': expiryDate,
+  //       'quantity': itemQuantity,
+  //       'numOfItemSold': numOfItemSold,
+  //       'price': price,
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  // Future<void> updateItemSoldThisMonth({
+  //   required String month,
+  //   required String itemId,
+  //   required String name,
+  //   required String barcode,
+  //   required String category,
+  //   required Timestamp dateCreated,
+  //   required int itemQuantity,
+  //   required int numOfItemSold,
+  //   required String expiryDate,
+  //   required double price,
+  // }) async {
+  //   try {
+  //     await salesCollection
+  //         .doc(month)
+  //         .collection('itemsSold')
+  //         .doc(itemId)
+  //         .update({
+  //       'name': name,
+  //       'barcode': barcode,
+  //       'category': category,
+  //       'dateCreated': dateCreated,
+  //       'expiryDate': expiryDate,
+  //       'quantity': itemQuantity,
+  //       'numOfItemSold': numOfItemSold,
+  //       'price': price,
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  //TODO::ADD MOST MARKETABLE ITEM FOR FORECASTING
+
   Future<void> updateSales({
     required double totalSales,
     required String month,
