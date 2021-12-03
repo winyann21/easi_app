@@ -249,7 +249,7 @@ class _StatsState extends State<Stats> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Product Details",
+                          "Products Status",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20.0,
@@ -271,11 +271,39 @@ class _StatsState extends State<Stats> {
                     children: [
                       ...snapshot.data!.docs
                           .map((QueryDocumentSnapshot<Object?> data) {
-                        return Container();
-
-                        //if expiryDate = "" dont show that data
-                        //show expiry date show many days left
-                        //show items left (quantity)
+                        final String name = data.get('name');
+                        final String photoURL = data.get('photoURL');
+                        return ListTile(
+                          leading: Icon(
+                            Icons.label,
+                            color: Colors.black38,
+                          ),
+                          title: Text(name),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //if expiryDate = "" dont show that data
+                              //show expiry date show many days left
+                              //show items left (quantity)
+                              Text('Day/s before expiration:'),
+                              Text('Item/s left:'),
+                            ],
+                          ),
+                          trailing: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: photoURL == ""
+                                ? Image.network(
+                                    "https://i.ibb.co/r7pkB30/default-thumbnail-icon.png",
+                                    width: 50,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    photoURL,
+                                    width: 50,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        );
                       }),
                     ],
                   ),
