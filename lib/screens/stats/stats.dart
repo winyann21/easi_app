@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
+import 'package:easi/screens/products/product_details.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_loading.dart';
@@ -44,7 +45,18 @@ class _StatsState extends State<Stats> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      body: salesBody(),
+      body: Column(
+        children: [
+          Expanded(child: salesBody()),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Divider(
+              color: Colors.black,
+            ),
+          ),
+          Expanded(child: expiryItems()),
+        ],
+      ),
     );
   }
 
@@ -133,6 +145,7 @@ class _StatsState extends State<Stats> {
                                                   'No marketable item yet.'),
                                             )
                                           : Card(
+                                              elevation: 4,
                                               margin: EdgeInsets.fromLTRB(
                                                   4, 2, 4, 2),
                                               child: Padding(
@@ -199,6 +212,76 @@ class _StatsState extends State<Stats> {
                   );
                 }),
               ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget expiryItems() {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      child: StreamBuilder(
+        stream: _productCollection
+            .orderBy('expiryDate', descending: true)
+            .limit(3)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+              child: Loading(),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(
+              child: Text('No items to be expired yet.'),
+            );
+          } else {
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Product Details",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.to(() => ProductDetails());
+                          },
+                          child: Text('See all >'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListView(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    children: [
+                      ...snapshot.data!.docs
+                          .map((QueryDocumentSnapshot<Object?> data) {
+                        return Container();
+
+                        //if expiryDate = "" dont show that data
+                        //show expiry date show many days left
+                        //show items left (quantity)
+                      }),
+                    ],
+                  ),
+                  //*DATA HERE
+                ],
+              ),
             );
           }
         },

@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     //*CRON RESET ITEMSOLD OF ITEMS EVERY MONTH
-    cron.schedule(new Schedule.parse('0 8 * 1 *'), () async {
+    cron.schedule(new Schedule.parse('* * * 1 *'), () async {
       await _productCollection.get().then((querySnapshot) async {
         if (querySnapshot.docs.isEmpty) {
           showToast(msg: 'An error has occured!');

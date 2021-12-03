@@ -26,7 +26,7 @@ class ProductDetailsState extends State<ProductDetails> {
       child: Column(
         children: [
           Container(
-
+            
           ),
         ],
       ),
