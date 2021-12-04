@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls, avoid_print, deprecated_member_use, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, unnecessary_null_comparison, sized_box_for_whitespace, prefer_typing_uninitialized_variables, avoid_function_literals_in_foreach_calls, avoid_print, deprecated_member_use, prefer_const_literals_to_create_immutables, unnecessary_string_interpolations
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cron/cron.dart';
 import 'package:easi/api/pdf_api.dart';
 import 'package:easi/api/pdf_invoice_api.dart';
 import 'package:easi/controllers/auth_controller.dart';
@@ -64,7 +65,7 @@ class _ProductsState extends State<Products> {
     'Others',
   ];
   String? category;
-
+  var cron = Cron();
   @override
   void initState() {
     super.initState();
@@ -313,36 +314,40 @@ class _ProductsState extends State<Products> {
 
                           //*EXPIRY DATE
                           var expiryMessage = getExpiryDate == ""
-                              ? ""
+                              ? ''
                               : dayDifference <= 0
-                                  ? '$name has expired'
+                                  ? '$name has expired.'
                                   : dayDifference > 30
                                       ? ''
-                                      : '$name will be expiring at $getExpiryDate';
+                                      : '$name will be expiring soon.';
 
                           var expiryDateStatus = getExpiryDate == ""
-                              ? ""
+                              ? ''
                               : dayDifference <= 0
-                                  ? 'Expiry Date: $getExpiryDate'
+                                  ? 'Expiry Date: $getExpiryDate.'
                                   : dayDifference > 30
                                       ? ''
-                                      : '$dayDifference day/s left.';
+                                      : '$dayDifference day/s remaining.';
 
                           //*QUANTITY
                           var quantityMessage = quantity > 10
                               ? ''
                               : '$name needs to be restocked.';
+
                           var quantityStatus =
-                              quantity > 10 ? '' : 'Item/s left: $quantity';
+                              quantity > 10 ? '' : 'Item/s left: $quantity.';
+
                           //CAN ADD DURATION IF NEEDED
                           if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
-                            Future.delayed(Duration(minutes: 15), () {
+                            //!DURATION CAN BE CHANGED
+
+                            Future.delayed(Duration(seconds: 1), () {
                               _notificationService.notificationsPlugin
                                   .schedule(
                                 uniqueID,
-                                '$expiryMessage. $quantityMessage',
-                                '$expiryDateStatus. $quantityStatus',
+                                '$expiryMessage $quantityMessage',
+                                '$expiryDateStatus $quantityStatus',
                                 duration,
                                 _notificationService.notificationDetails,
                               )
@@ -358,12 +363,14 @@ class _ProductsState extends State<Products> {
                               });
                             });
                           } else if (quantity <= 10) {
-                            Future.delayed(Duration(minutes: 15), () {
+                            //!DURATION CAN BE CHANGED
+
+                            Future.delayed(Duration(seconds: 1), () {
                               _notificationService.notificationsPlugin
                                   .show(
                                 uniqueID,
-                                '$expiryMessage. $quantityMessage',
-                                '$expiryDateStatus. $quantityStatus',
+                                '$expiryMessage $quantityMessage',
+                                '$expiryDateStatus $quantityStatus',
                                 _notificationService.notificationDetails,
                               )
                                   .whenComplete(() async {
