@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, avoid_function_literals_in_foreach_calls
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, avoid_function_literals_in_foreach_calls, avoid_print
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +43,7 @@ class _HomeState extends State<Home> {
       .collection('users')
       .doc(_authController.user!.uid)
       .collection('products');
+
   var date = DateTime.now().add(Duration(hours: 8));
   late String dateMonth = DateFormat('MMMM').format(date);
 
@@ -54,7 +55,7 @@ class _HomeState extends State<Home> {
     cron.schedule(Schedule.parse('0 0 1 * *'), () async {
       await _productCollection.get().then((querySnapshot) async {
         if (querySnapshot.docs.isEmpty) {
-          showToast(msg: 'An error has occured!');
+          print('No data to reset');
         } else {
           querySnapshot.docs.forEach((doc) async {
             //*RESET ITEM SOLD OF ITEMS

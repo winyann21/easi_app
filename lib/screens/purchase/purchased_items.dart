@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_function_literals_in_foreach_calls, await_only_futures
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sized_box_for_whitespace, avoid_function_literals_in_foreach_calls, await_only_futures, duplicate_ignore
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
@@ -35,6 +35,11 @@ class _PurchasedItemsState extends State<PurchasedItems> {
       .collection('users')
       .doc(_authController.user!.uid)
       .collection('products');
+
+  final CollectionReference _forecastCollection = FirebaseFirestore.instance
+      .collection('users')
+      .doc(_authController.user!.uid)
+      .collection('forecastedItem');
   final TextEditingController _enterCash = TextEditingController();
 
   double? totalSales;
@@ -101,6 +106,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                   content: Form(
                     key: _purchaseItemFormKey,
                     child: RoundRectTextFormField(
+                        keyboardType: TextInputType.number,
                         prefixIcon: Icons.attach_money_sharp,
                         controller: _enterCash,
                         hintText: 'Enter Cash',
@@ -181,12 +187,6 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                   onPressed: () async {
                                     //*UPDATE DATABASES
                                     String? pId;
-                                    String? name;
-                                    String? barcode;
-                                    String? category;
-                                    Timestamp? dateCreated;
-                                    String? expiryDate;
-                                    double? price;
                                     int? pQuantitySold;
                                     int? quantity;
                                     int? currentItemSold;
@@ -196,13 +196,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         .then((snapshot) {
                                       snapshot.docs.forEach((item) async {
                                         pId = item.get('id');
-                                        name = item.get('name');
-                                        barcode = item.get('barcode');
-                                        category = item.get('category');
-                                        dateCreated = item.get('dateCreated');
-                                        expiryDate = item.get('expiryDate');
                                         quantity = item.get('quantity');
-                                        price = item.get('price');
                                         pQuantitySold =
                                             item.get('quantitySold');
                                         currentItemSold =
@@ -224,8 +218,6 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                       });
                                     });
 
-                                    //TODO:: SALES COLLECTION UPDATE
-
                                     var sales = await sdb.salesCollection
                                         .doc(dateMonth)
                                         .get();
@@ -237,7 +229,6 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                     }
 
                                     //*ELSE(UPDATE DOC)
-                                    // ignore: await_only_futures
                                     var salesDS = await sdb.salesCollection
                                         .doc(dateMonth);
                                     if (sales.exists) {
@@ -249,6 +240,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                         );
                                       });
                                     }
+
                                     showToast(msg: 'Purchase Success');
                                     Navigator.pop(context, true);
                                     _enterCash.clear();

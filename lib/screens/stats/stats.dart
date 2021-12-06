@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
@@ -36,6 +36,7 @@ class _StatsState extends State<Stats> {
   var date = DateTime.now().add(Duration(hours: 8));
   late String dateMonth = DateFormat('MMMM').format(date);
   var dayDifference;
+
   @override
   void initState() {
     super.initState();
@@ -87,7 +88,7 @@ class _StatsState extends State<Stats> {
 
                   return Column(
                     children: [
-                      SizedBox(height: 15.0),
+                      SizedBox(height: 10.0),
                       //*MONTH TITLE
                       Text(
                         month,
@@ -96,25 +97,25 @@ class _StatsState extends State<Stats> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 15.0),
+                      SizedBox(height: 10.0),
                       //*TOTAL SALES
                       Text('Total Sales'),
                       totalSales < 0
                           ? Text(
                               '0.00',
                               style: TextStyle(
-                                fontSize: 26.0,
+                                fontSize: 28.0,
                                 fontWeight: FontWeight.w600,
                               ),
                             )
                           : Text(
                               totalSales.toStringAsFixed(2),
                               style: TextStyle(
-                                fontSize: 26.0,
+                                fontSize: 28.0,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-
+                      SizedBox(height: 10.0),
                       StreamBuilder(
                         stream: _productCollection
                             .orderBy('numOfItemSold', descending: true)
@@ -237,7 +238,7 @@ class _StatsState extends State<Stats> {
             );
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
-              child: Text('No items to be expired yet.'),
+              child: Text('No items yet.'),
             );
           } else {
             return Container(
@@ -269,9 +270,7 @@ class _StatsState extends State<Stats> {
                     ),
                     ListView(
                       shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics(),
-                      ),
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
                         ...snapshot.data!.docs
                             .map((QueryDocumentSnapshot<Object?> data) {

@@ -8,10 +8,12 @@ import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/models/invoice.dart';
 import 'package:easi/screens/products/functions/product_add.dart';
 import 'package:easi/screens/products/functions/product_edit.dart';
+import 'package:easi/services/forecasting_database.dart';
 import 'package:easi/services/local_notification.dart';
 import 'package:easi/services/notification_database.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
+import 'package:easi/utils/notification_id.dart';
 import 'package:easi/widgets/app_loading.dart';
 import 'package:easi/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
@@ -35,12 +37,17 @@ class _ProductsState extends State<Products> {
       LocalNotificationService();
   final ProductDB db = ProductDB();
   final SalesDB sdb = SalesDB();
+  final ForecastDB fdb = ForecastDB();
   final NotificationDB ndb = NotificationDB();
 
   final CollectionReference _productCollection = FirebaseFirestore.instance
       .collection('users')
       .doc(_authController.user!.uid)
       .collection('products');
+  final CollectionReference _forecastCollection = FirebaseFirestore.instance
+      .collection('users')
+      .doc(_authController.user!.uid)
+      .collection('forecastedItem');
 
   final isDialOpen = ValueNotifier(false);
   var dayDifference;
@@ -274,7 +281,7 @@ class _ProductsState extends State<Products> {
                           //*GET DATE NOW
                           var getDateNow = DateTime.now();
                           final formatDateNow =
-                              DateFormat('MM-dd-yyyy').format(getDateNow);
+                              DateFormat('yyyy-MM-dd').format(getDateNow);
 
                           //*GET EXPIRYDATE
                           String getExpiryDate = data.get('expiryDate');
@@ -297,7 +304,6 @@ class _ProductsState extends State<Products> {
                               DateFormat('MM-dd-yyyy').format(date);
 
                           //*****NOTIFICATIONS****/
-
                           int daysBetween(DateTime from, DateTime to) {
                             from = DateTime(from.year, from.month, from.day);
                             to = DateTime(to.year, to.month, to.day);
@@ -364,7 +370,6 @@ class _ProductsState extends State<Products> {
                             });
                           } else if (quantity <= 10) {
                             //!DURATION CAN BE CHANGED
-
                             Future.delayed(Duration(seconds: 1), () {
                               _notificationService.notificationsPlugin
                                   .show(
@@ -389,6 +394,76 @@ class _ProductsState extends State<Products> {
                               await ndb.deleteNotif(id: data.id);
                             });
                           }
+
+                          //*FORECASTING**/
+                          //add most numOfItemSold item in collection
+
+                          Future.delayed(Duration(seconds: 1), () async {
+                            await _productCollection
+                                .orderBy('numOfItemSold', descending: true)
+                                .limit(1)
+                                .get()
+                                .then((querySnapshot) {
+                              if (querySnapshot.docs.isEmpty) {
+                                print('No data to forecast');
+                              } else {
+                                querySnapshot.docs.forEach((doc) async {
+                                  final String fName = doc.get('name');
+                                  final double fPrice = doc.get('price');
+                                  final int fNumOfItemSold =
+                                      doc.get('numOfItemSold');
+
+                                  await fdb.addForecastedItem(
+                                    uniqueID: createUniqueId(),
+                                    name: fName,
+                                    numOfItemSold: fNumOfItemSold,
+                                    month: dateMonth,
+                                    price: fPrice,
+                                  );
+                                });
+                              }
+                            });
+                          });
+
+                          //notif forecast
+                          //!DURATION CAN BE CHANGED!
+                          Future.delayed(Duration(seconds: 1), () async {
+                            var date = DateTime.now();
+                            var formatDateForecast;
+
+                            _forecastCollection
+                                .where('dateForecasted',
+                                    isGreaterThanOrEqualTo:
+                                        DateTime(date.year, date.month + 1, 0))
+                                .limit(1)
+                                .orderBy('dateForecasted')
+                                .get()
+                                .then((querySnapshot) {
+                              if (querySnapshot.docs.isEmpty) {
+                                print('No data to forecast');
+                              } else {
+                                querySnapshot.docs.forEach((doc) async {
+                                  final String pName = doc.get('name');
+                                  final int prodNumOfItemSold =
+                                      doc.get('numOfItemSold');
+                                  final String pMonth = doc.get('month');
+                                  final dateForecasted =
+                                      doc.get('dateForecasted');
+                                  final DateTime dateF =
+                                      DateTime.fromMicrosecondsSinceEpoch(
+                                          dateForecasted
+                                              .microsecondsSinceEpoch);
+                                  formatDateForecast =
+                                      DateFormat('yyyy-MM-dd').format(dateF);
+                                });
+                                print(formatDateForecast.toString());
+                                //show notification here
+
+                              }
+                            });
+                          });
+                          //add notification for forecasting
+                          //add forecast screen for months(forecasted marketable item this month).
 
                           //*DISPLAY DATA
                           return Padding(
