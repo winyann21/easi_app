@@ -347,7 +347,7 @@ class _ProductsState extends State<Products> {
                           if (getExpiryDate != "" && dayDifference < 30) {
                             var duration = expDate.subtract(Duration(days: 30));
                             //!DURATION CAN BE CHANGED
-
+                            //cron here is possible
                             Future.delayed(Duration(seconds: 1), () {
                               _notificationService.notificationsPlugin
                                   .schedule(
@@ -370,6 +370,7 @@ class _ProductsState extends State<Products> {
                             });
                           } else if (quantity <= 10) {
                             //!DURATION CAN BE CHANGED
+                            //can use cron here to background tasks
                             Future.delayed(Duration(seconds: 1), () {
                               _notificationService.notificationsPlugin
                                   .show(
@@ -414,6 +415,7 @@ class _ProductsState extends State<Products> {
                                       doc.get('numOfItemSold');
 
                                   await fdb.addForecastedItem(
+                                    quantityLeft: quantity,
                                     uniqueID: createUniqueId(),
                                     name: fName,
                                     numOfItemSold: fNumOfItemSold,
@@ -429,8 +431,13 @@ class _ProductsState extends State<Products> {
                           //!DURATION CAN BE CHANGED!
                           Future.delayed(Duration(seconds: 1), () async {
                             var date = DateTime.now();
+                            var fDuration = date.add(Duration(seconds: 5));
                             var formatDateForecast;
-
+                            int? fId;
+                            String? pName;
+                            int? pNumOfItemSold;
+                            int? quantityLeft;
+                            String? pMonth;
                             _forecastCollection
                                 .where('dateForecasted',
                                     isGreaterThanOrEqualTo:
@@ -443,10 +450,11 @@ class _ProductsState extends State<Products> {
                                 print('No data to forecast');
                               } else {
                                 querySnapshot.docs.forEach((doc) async {
-                                  final String pName = doc.get('name');
-                                  final int prodNumOfItemSold =
-                                      doc.get('numOfItemSold');
-                                  final String pMonth = doc.get('month');
+                                  fId = doc.get('uniqueID');
+                                  quantityLeft = doc.get('quantityLeft');
+                                  pName = doc.get('name');
+                                  pNumOfItemSold = doc.get('numOfItemSold');
+                                  pMonth = doc.get('month');
                                   final dateForecasted =
                                       doc.get('dateForecasted');
                                   final DateTime dateF =
@@ -456,9 +464,17 @@ class _ProductsState extends State<Products> {
                                   formatDateForecast =
                                       DateFormat('yyyy-MM-dd').format(dateF);
                                 });
-                                print(formatDateForecast.toString());
                                 //show notification here
-
+                                //every 1hr notif //!can be changed
+                                cron.schedule(Schedule.parse('*/60 * * * *'),
+                                    () async {
+                                  _notificationService.notificationsPlugin.show(
+                                    fId!,
+                                    "Today's forecast: $pMonth is coming.",
+                                    'Get ready to restock $pName. Items left: $quantityLeft.',
+                                    _notificationService.notificationDetails,
+                                  );
+                                });
                               }
                             });
                           });
