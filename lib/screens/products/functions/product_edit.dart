@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print, await_only_futures
+// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print, await_only_futures, avoid_function_literals_in_foreach_calls
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -44,6 +44,10 @@ class ProductEdit extends StatefulWidget {
 class _ProductEditState extends State<ProductEdit> {
   final _authController = Get.find<AuthController>();
 
+  late final CollectionReference _productCollection = FirebaseFirestore.instance
+      .collection('users')
+      .doc(_authController.user!.uid)
+      .collection('products');
   final focus = FocusNode();
   File? _pickedImage;
   DateTime? date;
@@ -535,6 +539,21 @@ class _ProductEditState extends State<ProductEdit> {
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
             String category = pCategory!;
+            String? tName;
+
+            await _productCollection
+                .limit(1)
+                .where('name', isEqualTo: name)
+                .get()
+                .then((querySnapshot) {
+              if (querySnapshot.docs.isEmpty) {
+                print('No data to compare');
+              } else {
+                querySnapshot.docs.forEach((doc) async {
+                  tName = doc.get('name');
+                });
+              }
+            });
 
             if (_pickedImage == null) {
             } else {
@@ -548,27 +567,31 @@ class _ProductEditState extends State<ProductEdit> {
               photoUrl = await ref.getDownloadURL();
             }
 
-            await db
-                .updateProduct(
-              id: productId,
-              photoURL: photoUrl,
-              barcode: barcode,
-              name: name,
-              category: category,
-              quantity: quantity,
-              price: price,
-              expiryDate: expiryDate,
-            )
-                .then((value) {
-              _barcodeController.clear();
-              _nameController.clear();
-              _priceController.clear();
-              _quantityController.clear();
-              _expiryDateController.clear();
-            });
+            if (name == tName) {
+              showToast(msg: 'Name already exists');
+            } else {
+              await db
+                  .updateProduct(
+                id: productId,
+                photoURL: photoUrl,
+                barcode: barcode,
+                name: name,
+                category: category,
+                quantity: quantity,
+                price: price,
+                expiryDate: expiryDate,
+              )
+                  .then((value) {
+                _barcodeController.clear();
+                _nameController.clear();
+                _priceController.clear();
+                _quantityController.clear();
+                _expiryDateController.clear();
+              });
 
-            showToast(msg: "Product Updated");
-            Get.back();
+              showToast(msg: "Product Updated");
+              Get.back();
+            }
           }
         } catch (e) {
           showToast(msg: 'An error has occured');

@@ -1,5 +1,7 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, unused_catch_clause
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, unused_catch_clause, await_only_futures
+import 'dart:async';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
@@ -26,7 +28,10 @@ class ProductAdd extends StatefulWidget {
 
 class _ProductAddState extends State<ProductAdd> {
   final _authController = Get.find<AuthController>();
-
+  late final CollectionReference _productCollection = FirebaseFirestore.instance
+      .collection('users')
+      .doc(_authController.user!.uid)
+      .collection('products');
   final focus = FocusNode();
   File? _pickedImage;
   DateTime? date;
@@ -60,7 +65,7 @@ class _ProductAddState extends State<ProductAdd> {
     'Others',
   ];
   String? value;
-
+  bool _nameExist = false;
   @override
   void initState() {
     _barcodeController.text = widget.getBarcode!;
@@ -357,10 +362,8 @@ class _ProductAddState extends State<ProductAdd> {
           borderSide: BorderSide(color: Colors.orange),
           borderRadius: BorderRadius.circular(10.0),
         ),
-        
         isDense: true,
       ),
-      
       isExpanded: true,
       iconSize: 36,
       icon: Icon(
@@ -441,6 +444,21 @@ class _ProductAddState extends State<ProductAdd> {
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
             String category = value!;
+            String? tName;
+
+            await _productCollection
+                .limit(1)
+                .where('name', isEqualTo: name)
+                .get()
+                .then((querySnapshot) {
+              if (querySnapshot.docs.isEmpty) {
+                print('No data to compare');
+              } else {
+                querySnapshot.docs.forEach((doc) async {
+                  tName = doc.get('name');
+                });
+              }
+            });
 
             if (_pickedImage == null) {
               photoUrl = "";
@@ -456,28 +474,32 @@ class _ProductAddState extends State<ProductAdd> {
               photoUrl = await ref.getDownloadURL();
             }
 
-            await db
-                .addProduct(
-              uniqueID: createUniqueId(),
-              photoURL: photoUrl,
-              barcode: barcode,
-              name: name,
-              category: category,
-              quantity: quantity,
-              numOfItemSold: 0,
-              price: price,
-              expiryDate: expiryDate,
-            )
-                .then((value) {
-              _barcodeController.clear();
-              _nameController.clear();
-              _priceController.clear();
-              _quantityController.clear();
-              _expiryDateController.clear();
-            });
+            if (name == tName) {
+              showToast(msg: 'Name already exists');
+            } else {
+              await db
+                  .addProduct(
+                uniqueID: createUniqueId(),
+                photoURL: photoUrl,
+                barcode: barcode,
+                name: name,
+                category: category,
+                quantity: quantity,
+                numOfItemSold: 0,
+                price: price,
+                expiryDate: expiryDate,
+              )
+                  .then((value) {
+                _barcodeController.clear();
+                _nameController.clear();
+                _priceController.clear();
+                _quantityController.clear();
+                _expiryDateController.clear();
+              });
 
-            showToast(msg: "Product Added");
-            Get.back();
+              showToast(msg: "Product Added");
+              Get.back();
+            }
           }
         } catch (e) {
           showToast(msg: 'An error has occured');
