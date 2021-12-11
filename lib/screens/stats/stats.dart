@@ -277,6 +277,7 @@ class _StatsState extends State<Stats> {
                           final String name = data.get('name');
                           final String photoURL = data.get('photoURL');
                           final int quantity = data.get('quantity');
+                          final int numOfItemSold = data.get('numOfItemSold');
                           var getDateNow = DateTime.now();
                           String getExpiryDate = data.get('expiryDate');
 
@@ -360,6 +361,21 @@ class _StatsState extends State<Stats> {
                                             ],
                                           ),
                                         ),
+
+                                  Text.rich(
+                                    TextSpan(
+                                      text: 'Number of item sold: ',
+                                      children: <InlineSpan>[
+                                        TextSpan(
+                                          text: '$numOfItemSold',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                               trailing: ClipRRect(

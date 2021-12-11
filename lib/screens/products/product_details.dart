@@ -78,6 +78,7 @@ class ProductDetailsState extends State<ProductDetails> {
                             .map((QueryDocumentSnapshot<Object?> data) {
                           final String name = data.get('name');
                           final String photoURL = data.get('photoURL');
+                          final int numOfItemSold = data.get('numOfItemSold');
                           final int quantity = data.get('quantity');
                           var getDateNow = DateTime.now();
                           String getExpiryDate = data.get('expiryDate');
@@ -162,6 +163,20 @@ class ProductDetailsState extends State<ProductDetails> {
                                             ],
                                           ),
                                         ),
+                                  Text.rich(
+                                    TextSpan(
+                                      text: 'Number of item sold: ',
+                                      children: <InlineSpan>[
+                                        TextSpan(
+                                          text: '$numOfItemSold',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                               trailing: ClipRRect(

@@ -413,10 +413,12 @@ class _ProductsState extends State<Products> {
                                   final double fPrice = doc.get('price');
                                   final int fNumOfItemSold =
                                       doc.get('numOfItemSold');
+                                  final String fPhotoUrl = doc.get('photoURL');
 
                                   await fdb.addForecastedItem(
                                     quantityLeft: quantity,
                                     uniqueID: createUniqueId(),
+                                    photoUrl: fPhotoUrl,
                                     name: fName,
                                     numOfItemSold: fNumOfItemSold,
                                     month: dateMonth,
@@ -436,9 +438,8 @@ class _ProductsState extends State<Products> {
                             int? fId;
                             String? pName;
                             int? pNumOfItemSold;
-                            int? quantityLeft;
                             String? pMonth;
-                            _forecastCollection
+                            await _forecastCollection
                                 .where('dateForecasted',
                                     isGreaterThanOrEqualTo:
                                         DateTime(date.year, date.month + 1, 0))
@@ -451,7 +452,6 @@ class _ProductsState extends State<Products> {
                               } else {
                                 querySnapshot.docs.forEach((doc) async {
                                   fId = doc.get('uniqueID');
-                                  quantityLeft = doc.get('quantityLeft');
                                   pName = doc.get('name');
                                   pNumOfItemSold = doc.get('numOfItemSold');
                                   pMonth = doc.get('month');
@@ -471,7 +471,7 @@ class _ProductsState extends State<Products> {
                                   _notificationService.notificationsPlugin.show(
                                     fId!,
                                     "Today's forecast: $pMonth is coming.",
-                                    'Get ready to restock $pName. Items left: $quantityLeft.',
+                                    'Get ready to restock $pName.',
                                     _notificationService.notificationDetails,
                                   );
                                 });

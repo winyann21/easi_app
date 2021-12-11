@@ -555,7 +555,7 @@ class _ProductEditState extends State<ProductEdit> {
               }
             });
 
-            if (_pickedImage == null) {
+            if (_pickedImage == null) { 
             } else {
               final ref = FirebaseStorage.instance
                   .ref()

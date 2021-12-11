@@ -22,34 +22,17 @@ class ForecastDB {
     required String month,
     required double price,
     required int quantityLeft,
+    required String photoUrl,
   }) async {
     try {
       await forecastCollection.doc(month).set({
+        'month': month,
         'uniqueID': uniqueID,
+        'photoUrl': photoUrl,
         'name': name,
         'numOfItemSold': numOfItemSold,
         'price': price,
         'dateForecasted': FieldValue.serverTimestamp(),
-        'quantityLeft': quantityLeft,
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> updateForecastedItem({
-    required String name,
-    required int numOfItemSold,
-    required String month,
-    required String dateForecasted,
-    required double price,
-  }) async {
-    try {
-      await forecastCollection.doc(month).update({
-        'name': name,
-        'numOfItemSold': numOfItemSold,
-        'price': price,
-        'dateForecasted': dateForecasted,
       });
     } catch (e) {
       print(e);

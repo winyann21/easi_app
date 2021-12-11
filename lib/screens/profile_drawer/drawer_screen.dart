@@ -2,6 +2,7 @@
 
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/controllers/user_controller.dart';
+import 'package:easi/screens/forecast/forecast.dart';
 import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/products/product_details.dart';
@@ -51,6 +52,13 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       child: Column(
                         children: [
                           Divider(color: Colors.grey[850]),
+                          buildMenuItem(
+                            menuName: 'Forecast',
+                            menuIcon: Icons.cloud,
+                            onClicked: () {
+                              Get.to(() => Forecast());
+                            },
+                          ),
                           const SizedBox(height: 16),
                           buildMenuItem(
                             menuName: 'Product Details',
@@ -76,9 +84,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                               Get.to(() => PurchasedItems());
                             },
                           ),
-                          //*ADD PRODUCT
-                          //*ADD PRODUCT WITH BARCODE
-                          //*GENERATE PDF
                           const SizedBox(height: 16),
                           buildMenuItem(
                             menuName: 'Notifications',

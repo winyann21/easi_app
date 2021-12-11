@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
+import 'package:easi/screens/home/home.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/purchased_items_database.dart';
@@ -243,6 +244,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
 
                                     showToast(msg: 'Purchase Success');
                                     Navigator.pop(context, true);
+                                    Get.to(() => Home());
                                     _enterCash.clear();
                                   },
                                   child: Text(
