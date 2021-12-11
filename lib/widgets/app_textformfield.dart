@@ -90,6 +90,7 @@ class RoundRectTextFormField extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted,
+      textCapitalization: TextCapitalization.words,
     );
   }
 }

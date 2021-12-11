@@ -53,12 +53,15 @@ class _ProductAddState extends State<ProductAdd> {
   String dateMonth = DateFormat('MMMM').format(DateTime.now()); //*GET MONTH
 
   final List<String> productCategories = [
+    'All',
     'Appliances',
     'Clothing',
+    'Cosmetics',
     'Drinks',
     'Equipments',
     'Food',
     'Games',
+    'Music',
     'Shoes',
     'Sports',
     'Technology',

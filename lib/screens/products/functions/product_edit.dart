@@ -69,12 +69,15 @@ class _ProductEditState extends State<ProductEdit> {
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
 
   final List<String> productCategories = [
+    'All',
     'Appliances',
     'Clothing',
+    'Cosmetics',
     'Drinks',
     'Equipments',
     'Food',
     'Games',
+    'Music',
     'Shoes',
     'Sports',
     'Technology',
@@ -555,7 +558,7 @@ class _ProductEditState extends State<ProductEdit> {
               }
             });
 
-            if (_pickedImage == null) { 
+            if (_pickedImage == null) {
             } else {
               final ref = FirebaseStorage.instance
                   .ref()

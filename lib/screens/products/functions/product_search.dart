@@ -432,8 +432,6 @@ class ProductSearch extends SearchDelegate {
               ],
             );
           }
-          //*FETCH DATA HERE
-
         }
       },
     );

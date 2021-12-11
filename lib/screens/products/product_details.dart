@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, prefer_typing_uninitialized_variables
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
+import 'package:easi/screens/products/product_details_search.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_loading.dart';
@@ -39,6 +40,14 @@ class ProductDetailsState extends State<ProductDetails> {
       appBar: AppBar(
         centerTitle: true,
         title: Text('Products Status'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showSearch(context: context, delegate: ProductDetailsSearch());
+            },
+            icon: Icon(Icons.search),
+          ),
+        ],
       ),
     );
   }

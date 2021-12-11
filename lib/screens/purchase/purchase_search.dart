@@ -409,8 +409,6 @@ class PurchaseSearch extends SearchDelegate {
               ],
             );
           }
-          //*FETCH DATA HERE
-
         }
       },
     );
