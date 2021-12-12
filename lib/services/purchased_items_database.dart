@@ -28,7 +28,7 @@ class PurchasedItemsDB {
     try {
       await purchasedItemsCollection.doc(id).set({
         'id': id,
-        'name': name,
+        'name': name.toLowerCase(),
         'barcode': barcode,
         'expiryDate': expiryDate,
         'dateCreated': dateCreated,
@@ -60,7 +60,7 @@ class PurchasedItemsDB {
     try {
       await purchasedItemsCollection.doc(id).update({
         'id': id,
-        'name': name,
+        'name': name.toLowerCase(),
         'barcode': barcode,
         'expiryDate': expiryDate,
         'category': category,

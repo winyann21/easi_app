@@ -31,7 +31,7 @@ class ProductDB {
         'uniqueID': uniqueID,
         'photoURL': photoURL,
         'barcode': barcode,
-        'name': name,
+        'name': name.toLowerCase(),
         'category': category,
         'quantity': quantity,
         'price': price,
@@ -57,16 +57,19 @@ class ProductDB {
     required String photoURL,
   }) async {
     try {
-      await productCollection.doc(id).update({
-        'photoURL': photoURL,
-        'barcode': barcode,
-        'name': name,
-        'category': category,
-        'quantity': quantity,
-        'price': price,
-        'expiryDate': expiryDate,
-        'dateUpdated': FieldValue.serverTimestamp(),
-      });
+      await productCollection.doc(id).set(
+        {
+          'photoURL': photoURL,
+          'barcode': barcode,
+          'name': name.toLowerCase(),
+          'category': category,
+          'quantity': quantity,
+          'price': price,
+          'expiryDate': expiryDate,
+          'dateUpdated': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
     } catch (e) {
       print(e);
     }

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, unused_catch_clause, await_only_futures
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new, unused_catch_clause, await_only_futures, avoid_function_literals_in_foreach_calls, avoid_print
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -442,12 +442,12 @@ class _ProductAddState extends State<ProductAdd> {
         try {
           if (_productAddFormKey.currentState!.validate()) {
             String barcode = _barcodeController.text;
-            String name = _nameController.text;
+            String name = _nameController.text.toLowerCase();
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
             String category = value!;
-            String? tName;
+            String tName = '';
 
             await _productCollection
                 .limit(1)

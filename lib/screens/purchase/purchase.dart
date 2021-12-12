@@ -55,7 +55,7 @@ class _PurchaseState extends State<Purchase> {
   void initState() {
     total ??= 0;
 
-    name = widget.data!.get('name');
+    name = toBeginningOfSentenceCase(widget.data!.get('name'))!;
     barcode = widget.data!.get('barcode');
     photoUrl = widget.data!.get('photoURL');
     quantity = widget.data!.get('quantity');

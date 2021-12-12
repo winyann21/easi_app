@@ -310,7 +310,8 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                     children: [
                       ...snapshot.data!.docs
                           .map((QueryDocumentSnapshot<Object?> data) {
-                        final String name = data.get('name');
+                        final String? name =
+                            toBeginningOfSentenceCase(data.get('name'));
                         final int quantitySold = data.get('quantitySold');
                         final double totalPrice =
                             data.get('totalPrice').toDouble();
@@ -369,7 +370,7 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                   );
                                 },
                                 title: Text(
-                                  name,
+                                  name!,
                                   style: TextStyle(
                                     fontSize: 20.0,
                                   ),

@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
-import 'package:easi/screens/products/product_details.dart';
+import 'package:easi/screens/products/product_status.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_loading.dart';
@@ -133,7 +133,9 @@ class _StatsState extends State<Stats> {
                               children: [
                                 ...snapshot.data!.docs.map(
                                   (QueryDocumentSnapshot<Object?> data) {
-                                    final String itemName = data.get('name');
+                                    final String? itemName =
+                                        toBeginningOfSentenceCase(
+                                            data.get('name'));
                                     final int numOfItemSold =
                                         data.get('numOfItemSold');
                                     final String photoURL =
@@ -183,7 +185,7 @@ class _StatsState extends State<Stats> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        itemName,
+                                                        itemName!,
                                                         style: TextStyle(
                                                           fontSize: 16.0,
                                                           fontWeight:
@@ -261,7 +263,7 @@ class _StatsState extends State<Stats> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Get.to(() => ProductDetails());
+                              Get.to(() => ProductStatus());
                             },
                             child: Text('See all >'),
                           ),
@@ -274,7 +276,8 @@ class _StatsState extends State<Stats> {
                       children: [
                         ...snapshot.data!.docs
                             .map((QueryDocumentSnapshot<Object?> data) {
-                          final String name = data.get('name');
+                          final String? name =
+                              toBeginningOfSentenceCase(data.get('name'));
                           final String photoURL = data.get('photoURL');
                           final int quantity = data.get('quantity');
                           final int numOfItemSold = data.get('numOfItemSold');
@@ -303,7 +306,7 @@ class _StatsState extends State<Stats> {
                                 Icons.label,
                                 color: Colors.black38,
                               ),
-                              title: Text(name),
+                              title: Text(name!),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

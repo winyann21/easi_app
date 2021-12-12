@@ -102,7 +102,8 @@ class PurchaseSearch extends SearchDelegate {
                             .toLowerCase()
                             .contains(query.toLowerCase()))
                     .map((QueryDocumentSnapshot<Object?> data) {
-                  final String name = data.get('name');
+                  final String? name =
+                      toBeginningOfSentenceCase(data.get('name'));
                   final double price = data.get('price');
                   final int quantity = data.get('quantity');
                   final String photoURL = data.get('photoURL');
@@ -177,7 +178,7 @@ class PurchaseSearch extends SearchDelegate {
                                   ),
                           ),
                           title: Text(
-                            name,
+                            name!,
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
@@ -274,7 +275,8 @@ class PurchaseSearch extends SearchDelegate {
                             .toLowerCase()
                             .contains(query.toLowerCase()))
                     .map((QueryDocumentSnapshot<Object?> data) {
-                  final String name = data.get('name');
+                  final String? name =
+                      toBeginningOfSentenceCase(data.get('name'));
                   final double price = data.get('price');
                   final int quantity = data.get('quantity');
                   final String photoURL = data.get('photoURL');
@@ -349,7 +351,7 @@ class PurchaseSearch extends SearchDelegate {
                                   ),
                           ),
                           title: Text(
-                            name,
+                            name!,
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,

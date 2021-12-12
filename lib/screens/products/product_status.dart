@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
-import 'package:easi/screens/products/product_details_search.dart';
+import 'package:easi/screens/products/product_status_search.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_loading.dart';
@@ -13,14 +13,14 @@ import 'package:get/get.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:intl/intl.dart';
 
-class ProductDetails extends StatefulWidget {
-  const ProductDetails({Key? key}) : super(key: key);
+class ProductStatus extends StatefulWidget {
+  const ProductStatus({Key? key}) : super(key: key);
 
   @override
-  ProductDetailsState createState() => ProductDetailsState();
+  ProductStatusState createState() => ProductStatusState();
 }
 
-class ProductDetailsState extends State<ProductDetails> {
+class ProductStatusState extends State<ProductStatus> {
   static final _authController = Get.find<AuthController>(); //user data
   final SalesDB sdb = SalesDB();
   final ProductDB db = ProductDB();
@@ -43,7 +43,7 @@ class ProductDetailsState extends State<ProductDetails> {
         actions: [
           IconButton(
             onPressed: () {
-              showSearch(context: context, delegate: ProductDetailsSearch());
+              showSearch(context: context, delegate: ProductStatusSearch());
             },
             icon: Icon(Icons.search),
           ),
@@ -85,7 +85,8 @@ class ProductDetailsState extends State<ProductDetails> {
                       children: [
                         ...snapshot.data!.docs
                             .map((QueryDocumentSnapshot<Object?> data) {
-                          final String name = data.get('name');
+                          final String? name =
+                              toBeginningOfSentenceCase(data.get('name'));
                           final String photoURL = data.get('photoURL');
                           final int numOfItemSold = data.get('numOfItemSold');
                           final int quantity = data.get('quantity');
@@ -114,7 +115,7 @@ class ProductDetailsState extends State<ProductDetails> {
                                 Icons.label,
                                 color: Colors.black38,
                               ),
-                              title: Text(name),
+                              title: Text(name!),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [

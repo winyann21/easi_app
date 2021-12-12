@@ -85,7 +85,8 @@ class _ForecastState extends State<Forecast> {
                         children: [
                           ...snapshot.data!.docs
                               .map((QueryDocumentSnapshot<Object?> data) {
-                            final String name = data.get('name');
+                            final String? name =
+                                toBeginningOfSentenceCase(data.get('name'));
                             final String photoUrl = data.get('photoUrl');
                             final int numOfItemSold = data.get('numOfItemSold');
                             final double price = data.get('price').toDouble();
@@ -114,7 +115,7 @@ class _ForecastState extends State<Forecast> {
                                           style: TextStyle(color: Colors.black),
                                         ),
                                         Text(
-                                          name,
+                                          name!,
                                           style: TextStyle(
                                             fontSize: 32,
                                             fontWeight: FontWeight.bold,

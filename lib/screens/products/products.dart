@@ -289,7 +289,9 @@ class _ProductsState extends State<Products> {
                           String getExpiryDate = data.get('expiryDate');
 
                           //*GET DATAS
-                          final String name = data.get('name');
+                          final String? name =
+                              toBeginningOfSentenceCase(data.get('name'));
+
                           final int uniqueID = data.get('uniqueID');
                           final double price = data.get('price').toDouble();
                           final int quantity = data.get('quantity');
@@ -473,7 +475,7 @@ class _ProductsState extends State<Products> {
                                   _notificationService.notificationsPlugin.show(
                                     fId!,
                                     "Today's forecast: $pMonth is coming.",
-                                    'Get ready to restock $pName.',
+                                    'Get ready to restock $pName before $pMonth comes.',
                                     _notificationService.notificationDetails,
                                   );
                                 });
@@ -583,7 +585,7 @@ class _ProductsState extends State<Products> {
                                           ),
                                   ),
                                   title: Text(
-                                    name,
+                                    name!,
                                     style: TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.bold,

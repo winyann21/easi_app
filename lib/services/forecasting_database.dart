@@ -29,7 +29,7 @@ class ForecastDB {
         'month': month,
         'uniqueID': uniqueID,
         'photoUrl': photoUrl,
-        'name': name,
+        'name': name.toLowerCase(),
         'numOfItemSold': numOfItemSold,
         'price': price,
         'dateForecasted': FieldValue.serverTimestamp(),

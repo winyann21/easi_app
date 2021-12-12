@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print, await_only_futures, avoid_function_literals_in_foreach_calls
+// ignore_for_file: prefer_const_constructors, unnecessary_new, avoid_print, await_only_futures, avoid_function_literals_in_foreach_calls, prefer_typing_uninitialized_variables, prefer_is_empty
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -55,19 +55,19 @@ class _ProductEditState extends State<ProductEdit> {
   final ProductDB db = ProductDB();
   final SalesDB sdb = SalesDB();
   final TextEditingController _nameController = TextEditingController();
+
   final TextEditingController _barcodeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
 
   final GlobalKey<FormState> _productEditFormKey = GlobalKey<FormState>();
-
   String? scanResult;
   String barcode = '';
   String photoUrl = '';
   String productId = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
-
+  String? oldName;
   final List<String> productCategories = [
     'All',
     'Appliances',
@@ -89,8 +89,10 @@ class _ProductEditState extends State<ProductEdit> {
   void initState() {
     _barcodeController.text =
         widget.data != null ? widget.data!.get('barcode') : widget.barcode;
-    _nameController.text =
-        widget.data != null ? widget.data!.get('name') : widget.name;
+    _nameController.text = (widget.data != null
+        ? toBeginningOfSentenceCase(widget.data!.get('name'))
+        : toBeginningOfSentenceCase(widget.name))!;
+    oldName = widget.data != null ? widget.data!.get('name') : widget.name;
     pCategory =
         widget.data != null ? widget.data!.get('category') : widget.category;
 
@@ -537,7 +539,7 @@ class _ProductEditState extends State<ProductEdit> {
         try {
           if (_productEditFormKey.currentState!.validate()) {
             String barcode = _barcodeController.text;
-            String name = _nameController.text;
+            String name = _nameController.text.toLowerCase();
             int quantity = int.parse(_quantityController.text);
             double price = double.parse(_priceController.text);
             String expiryDate = _expiryDateController.text;
@@ -545,17 +547,13 @@ class _ProductEditState extends State<ProductEdit> {
             String? tName;
 
             await _productCollection
-                .limit(1)
                 .where('name', isEqualTo: name)
+                .limit(1)
                 .get()
                 .then((querySnapshot) {
-              if (querySnapshot.docs.isEmpty) {
-                print('No data to compare');
-              } else {
-                querySnapshot.docs.forEach((doc) async {
-                  tName = doc.get('name');
-                });
-              }
+              querySnapshot.docs.forEach((doc) async {
+                tName = doc.get('name');
+              });
             });
 
             if (_pickedImage == null) {
@@ -569,8 +567,28 @@ class _ProductEditState extends State<ProductEdit> {
               await ref.putFile(_pickedImage!);
               photoUrl = await ref.getDownloadURL();
             }
-
-            if (name == tName) {
+            if (name == oldName) {
+              await db
+                  .updateProduct(
+                id: productId,
+                photoURL: photoUrl,
+                barcode: barcode,
+                name: name,
+                category: category,
+                quantity: quantity,
+                price: price,
+                expiryDate: expiryDate,
+              )
+                  .then((value) {
+                _barcodeController.clear();
+                _nameController.clear();
+                _priceController.clear();
+                _quantityController.clear();
+                _expiryDateController.clear();
+              });
+              showToast(msg: "Product Updated");
+              Get.back();
+            } else if (name == tName) {
               showToast(msg: 'Name already exists');
             } else {
               await db
@@ -591,7 +609,6 @@ class _ProductEditState extends State<ProductEdit> {
                 _quantityController.clear();
                 _expiryDateController.clear();
               });
-
               showToast(msg: "Product Updated");
               Get.back();
             }

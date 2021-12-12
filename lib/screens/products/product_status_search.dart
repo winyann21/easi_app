@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 
-class ProductDetailsSearch extends SearchDelegate {
-  ProductDetailsSearch({
+class ProductStatusSearch extends SearchDelegate {
+  ProductStatusSearch({
     String hintText = "Scan or Search Item",
   }) : super(
           searchFieldLabel: hintText,
@@ -110,7 +110,8 @@ class ProductDetailsSearch extends SearchDelegate {
                                     .toLowerCase()
                                     .contains(query.toLowerCase()))
                             .map((QueryDocumentSnapshot<Object?> data) {
-                          final String name = data.get('name');
+                          final String? name =
+                              toBeginningOfSentenceCase(data.get('name'));
                           final String photoURL = data.get('photoURL');
                           final int numOfItemSold = data.get('numOfItemSold');
                           final int quantity = data.get('quantity');
@@ -139,7 +140,7 @@ class ProductDetailsSearch extends SearchDelegate {
                                 Icons.label,
                                 color: Colors.black38,
                               ),
-                              title: Text(name),
+                              title: Text(name!),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -285,7 +286,8 @@ class ProductDetailsSearch extends SearchDelegate {
                                     .toLowerCase()
                                     .contains(query.toLowerCase()))
                             .map((QueryDocumentSnapshot<Object?> data) {
-                          final String name = data.get('name');
+                          final String? name =
+                              toBeginningOfSentenceCase(data.get('name'));
                           final String photoURL = data.get('photoURL');
                           final int numOfItemSold = data.get('numOfItemSold');
                           final int quantity = data.get('quantity');
@@ -314,7 +316,7 @@ class ProductDetailsSearch extends SearchDelegate {
                                 Icons.label,
                                 color: Colors.black38,
                               ),
-                              title: Text(name),
+                              title: Text(name!),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
