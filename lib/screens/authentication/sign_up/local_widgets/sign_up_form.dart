@@ -67,6 +67,7 @@ class _SignUpFormState extends State<SignUpForm> {
               return null;
             },
             textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.words,
           ),
           SizedBox(height: size.height * 0.01),
           RoundRectTextFormField(

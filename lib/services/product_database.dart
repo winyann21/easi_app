@@ -110,4 +110,10 @@ class ProductDB {
       print(e);
     }
   }
+
+  Future totalItems() async {
+    var querySnapshot = await productCollection.get();
+    var totalItems = querySnapshot.docs.length;
+    return totalItems;
+  }
 }

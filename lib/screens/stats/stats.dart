@@ -84,7 +84,7 @@ class _StatsState extends State<Stats> {
                 ...snapshot.data!.docs
                     .map((QueryDocumentSnapshot<Object?> data) {
                   final String month = data.get('month');
-                  final double totalSales = data.get('totalSales');
+                  var totalSales = data.get('totalSales');
 
                   return Column(
                     children: [

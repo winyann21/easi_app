@@ -396,6 +396,7 @@ class _ProductEditState extends State<ProductEdit> {
       suffixIcon: null,
       textInputAction: TextInputAction.next,
       validator: validateProductFields,
+      textCapitalization: TextCapitalization.words,
     );
   }
 

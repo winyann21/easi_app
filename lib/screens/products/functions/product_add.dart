@@ -7,6 +7,7 @@ import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/utils/notification_id.dart';
 import 'package:easi/utils/product_validations.dart';
+import 'package:easi/widgets/app_loading.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:easi/widgets/app_textformfield.dart';
@@ -309,6 +310,7 @@ class _ProductAddState extends State<ProductAdd> {
       suffixIcon: null,
       textInputAction: TextInputAction.next,
       validator: validateProductFields,
+      textCapitalization: TextCapitalization.words,
     );
   }
 
@@ -480,6 +482,7 @@ class _ProductAddState extends State<ProductAdd> {
             if (name == tName) {
               showToast(msg: 'Name already exists');
             } else {
+              Loading();
               await db
                   .addProduct(
                 uniqueID: createUniqueId(),

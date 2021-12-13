@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_const, prefer_typing_uninitialized_variables
+// ignore_for_file: unnecessary_const, prefer_typing_uninitialized_variables, unnecessary_null_in_if_null_operators
 import 'package:flutter/material.dart';
 
 class RoundRectTextFormField extends StatelessWidget {
@@ -16,6 +16,7 @@ class RoundRectTextFormField extends StatelessWidget {
     this.keyboardType,
     this.onFieldSubmitted,
     this.onTap,
+    this.textCapitalization,
   }) : super(key: key);
 
   final TextEditingController? controller;
@@ -30,6 +31,7 @@ class RoundRectTextFormField extends StatelessWidget {
   final keyboardType;
   final onFieldSubmitted;
   final onTap;
+  final textCapitalization;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +92,7 @@ class RoundRectTextFormField extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted,
-      textCapitalization: TextCapitalization.words,
+      textCapitalization: textCapitalization ?? TextCapitalization.none,
     );
   }
 }

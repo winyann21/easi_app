@@ -75,11 +75,12 @@ class _ProductsState extends State<Products> {
   ];
   String? category;
   var cron = Cron();
+  var length;
+
   @override
   void initState() {
     super.initState();
     category = productCategories[0]; //* ALWAYS ALL CATEGORIES
-    //*IF DATEMONTH IS NOT EQUAL TO DATE NOW
   }
 
   @override
@@ -225,33 +226,61 @@ class _ProductsState extends State<Products> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            margin: EdgeInsets.all(8.0),
-            width: 200,
-            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 1.0),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.orange,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                  isExpanded: true,
-                  iconSize: 36,
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                margin: EdgeInsets.all(8.0),
+                width: 200,
+                padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 1.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.orange,
+                    width: 2,
                   ),
-                  items: productCategories.map(buildMenuItem).toList(),
-                  value: category,
-                  onChanged: (value) {
-                    setState(() {
-                      category = value;
-                    });
-                  }),
-            ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                      isExpanded: true,
+                      iconSize: 36,
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.black,
+                      ),
+                      items: productCategories.map(buildMenuItem).toList(),
+                      value: category,
+                      onChanged: (value) {
+                        setState(() {
+                          category = value;
+                        });
+                      }),
+                ),
+              ),
+              StreamBuilder(
+                stream: _productCollection.snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: Loading(),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Text('Items: 0'),
+                    );
+                  } else {
+                    var length = snapshot.data!.docs.length.toString();
+                    return Text(
+                      'Items: $length',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
           Expanded(
             child: StreamBuilder(
