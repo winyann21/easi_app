@@ -449,7 +449,6 @@ class _ProductsState extends State<Products> {
                                   final String fPhotoUrl = doc.get('photoURL');
 
                                   await fdb.addForecastedItem(
-                                    quantityLeft: quantity,
                                     uniqueID: createUniqueId(),
                                     photoUrl: fPhotoUrl,
                                     name: fName,

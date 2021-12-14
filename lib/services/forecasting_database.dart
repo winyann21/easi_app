@@ -21,7 +21,6 @@ class ForecastDB {
     required int numOfItemSold,
     required String month,
     required double price,
-    required int quantityLeft,
     required String photoUrl,
   }) async {
     try {
