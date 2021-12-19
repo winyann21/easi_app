@@ -309,7 +309,4 @@ class AuthController extends GetxController {
       );
     }
   }
-
-  //verifyOTP
-
 }
