@@ -410,7 +410,17 @@ class _ProductEditState extends State<ProductEdit> {
       suffixIcon: null,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
-      validator: validateProductFields,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Field is required";
+        } else if (double.parse(_priceController.text) > 0) {
+          return null;
+        } else if (double.parse(_priceController.text) == 0) {
+          return "Invalid input";
+        } else {
+          return "Invalid input";
+        }
+      },
     );
   }
 
@@ -424,7 +434,17 @@ class _ProductEditState extends State<ProductEdit> {
       suffixIcon: null,
       keyboardType: TextInputType.number,
       textInputAction: TextInputAction.next,
-      validator: validateProductFields,
+      validator: (value) {
+        if (value!.isEmpty) {
+          return "Field is required";
+        } else if (int.parse(_quantityController.text) > 0) {
+          return null;
+        } else if (int.parse(_quantityController.text) == 0) {
+          return "Invalid input";
+        } else {
+          return "Invalid input";
+        }
+      },
     );
   }
 
