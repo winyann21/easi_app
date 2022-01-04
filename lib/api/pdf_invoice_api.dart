@@ -29,18 +29,45 @@ class PdfInvoiceApi {
             Expanded(
               child: Image(
                 MemoryImage(logoImg),
-                width: 70,
+                width: 80,
               ),
             ),
             SizedBox(width: 0.5 * PdfPageFormat.cm),
-            Expanded(
-              child: Text(
-                'EASI: Easy Access Smart Inventory',
-                style: TextStyle(
-                  fontSize: 18.0,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'EASI',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+                Text(
+                  'Easy Access Smart Inventory',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  '+639362278056',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                  ),
+                ),
+                Text(
+                  'it.sherwinromero@gmail.com',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                  ),
+                ),
+              ],
             ),
+
+            //app name
+            //contact number
+            //email
           ],
         ),
         buildTitle(invoice),
