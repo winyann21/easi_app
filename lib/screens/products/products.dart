@@ -465,12 +465,10 @@ class _ProductsState extends State<Products> {
                           //!DURATION CAN BE CHANGED!
                           Future.delayed(Duration(seconds: 1), () async {
                             var date = DateTime.now();
-                            var fDuration = date.add(Duration(seconds: 5));
-                            var formatDateForecast;
                             int? fId;
                             String? pName;
-                            int? pNumOfItemSold;
                             String? pMonth;
+
                             await _forecastCollection
                                 .where('dateForecasted',
                                     isGreaterThanOrEqualTo:
@@ -485,16 +483,7 @@ class _ProductsState extends State<Products> {
                                 querySnapshot.docs.forEach((doc) async {
                                   fId = doc.get('uniqueID');
                                   pName = doc.get('name');
-                                  pNumOfItemSold = doc.get('numOfItemSold');
                                   pMonth = doc.get('month');
-                                  final dateForecasted =
-                                      doc.get('dateForecasted');
-                                  final DateTime dateF =
-                                      DateTime.fromMicrosecondsSinceEpoch(
-                                          dateForecasted
-                                              .microsecondsSinceEpoch);
-                                  formatDateForecast =
-                                      DateFormat('yyyy-MM-dd').format(dateF);
                                 });
                                 //show notification here
                                 //every 1hr notif //!can be changed

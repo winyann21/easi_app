@@ -281,8 +281,10 @@ class _PurchaseState extends State<Purchase> {
           return "No available stocks";
         } else if (int.parse(_newQuantity.text) > quantity!) {
           return "Must be less than item's quantity";
-        } else {
+        } else if (int.parse(_newQuantity.text) > 0) {
           return null;
+        } else {
+          return "Invalid input";
         }
       },
     );

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/api/pdf_api.dart';
 import 'package:easi/models/invoice.dart';
 import 'package:easi/utils.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -17,10 +18,31 @@ class PdfInvoiceApi {
   static String dateMonth = DateFormat('MMMM').format(dateNow);
   static Future<File> generate(Invoice invoice) async {
     final pdf = Document();
+    final logoImg = (await rootBundle.load('assets/icons/EASI_loginIcon.png'))
+        .buffer
+        .asUint8List();
 
     pdf.addPage(MultiPage(
       build: (context) => [
-        SizedBox(height: 3 * PdfPageFormat.cm),
+        pw.Row(
+          children: [
+            Expanded(
+              child: Image(
+                MemoryImage(logoImg),
+                width: 70,
+              ),
+            ),
+            SizedBox(width: 0.5 * PdfPageFormat.cm),
+            Expanded(
+              child: Text(
+                'EASI: Easy Access Smart Inventory',
+                style: TextStyle(
+                  fontSize: 18.0,
+                ),
+              ),
+            ),
+          ],
+        ),
         buildTitle(invoice),
         buildInvoice(invoice),
         Divider(),
@@ -35,15 +57,18 @@ class PdfInvoiceApi {
   static Widget buildTitle(Invoice invoice) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          //App name
+          //app image
+          SizedBox(height: 0.8 * PdfPageFormat.cm),
           Text(
-            '$dateMonth Monthly Report',
+            '$dateMonth Inventory Report',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 0.8 * PdfPageFormat.cm),
-          Text(date),
+          SizedBox(height: 0.3 * PdfPageFormat.cm),
+          Text('Date: $date'),
           SizedBox(height: 0.8 * PdfPageFormat.cm),
         ],
       );
