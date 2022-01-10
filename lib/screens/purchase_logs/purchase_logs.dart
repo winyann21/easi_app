@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/services/purchase_logs_database.dart';
 import 'package:easi/widgets/app_loading.dart';
+import 'package:easi/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -34,7 +35,55 @@ class _PurchaseLogsState extends State<PurchaseLogs> {
         actions: [
           IconButton(
             onPressed: () async {
-              //TODO::clear history
+              await _purchasedLogsCollection.get().then((querySnapshot) async {
+                if (querySnapshot.docs.isEmpty) {
+                  showToast(msg: 'No purchase history to clear.');
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(
+                        'History',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      content: Text('Clear Purchase history?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            _purchasedLogsCollection.get().then((snapshot) {
+                              for (DocumentSnapshot ds in snapshot.docs) {
+                                ds.reference.delete();
+                              }
+                            });
+                            Navigator.pop(context, true);
+                          },
+                          child: Text(
+                            'Yes',
+                            style: TextStyle(
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                          child: Text(
+                            'No',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
             },
             icon: Icon(Icons.delete_sweep_sharp),
           ),
