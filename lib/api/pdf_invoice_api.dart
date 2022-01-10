@@ -64,10 +64,6 @@ class PdfInvoiceApi {
                 ),
               ],
             ),
-
-            //app name
-            //contact number
-            //email
           ],
         ),
         buildTitle(invoice),
@@ -84,8 +80,6 @@ class PdfInvoiceApi {
   static Widget buildTitle(Invoice invoice) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          //App name
-          //app image
           SizedBox(height: 0.8 * PdfPageFormat.cm),
           Text(
             '$dateMonth Inventory Report',

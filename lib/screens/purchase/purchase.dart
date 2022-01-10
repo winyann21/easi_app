@@ -1,7 +1,8 @@
-// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, unused_local_variable, await_only_futures, duplicate_ignore
+// ignore_for_file: unnecessary_new, prefer_const_constructors, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, unused_local_variable, await_only_futures, duplicate_ignore, prefer_typing_uninitialized_variables
 
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/services/local_notification.dart';
 //import 'package:easi/services/database/sales_database.dart';
@@ -31,6 +32,7 @@ class _PurchaseState extends State<Purchase> {
   final _purchaseFormKey = GlobalKey<FormState>();
   final TextEditingController _newQuantity = new TextEditingController();
   // final TextEditingController _enterCash = new TextEditingController();
+
   double? total;
   double totalPrice = 1.0;
   double? totalPriceItemSold;
@@ -47,7 +49,7 @@ class _PurchaseState extends State<Purchase> {
   Timestamp? dateCreated;
   String category = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
-
+  var dayDifference;
   int? newQS;
   double? totPrice;
 
@@ -329,95 +331,115 @@ class _PurchaseState extends State<Purchase> {
               actions: [
                 TextButton(
                   onPressed: () async {
-                    //TODO:: DO ADD TO PURCHASED ITEMS SECTION
+                    var getDateNow = DateTime.now();
+                    final formatDateNow =
+                        DateFormat('yyyy-MM-dd').format(getDateNow);
+
                     String id = widget.data!.id; //*DOCUMENT ID
                     int amount = int.parse(_newQuantity.text);
                     // itemSold = (itemSold! + amount);
                     // quantity = (quantity! - amount);
                     totalPriceItemSold = (price! * amount);
-
-                    var pItems =
-                        await pidb.purchasedItemsCollection.doc(id).get();
-                    if (!pItems.exists) {
-                      await pidb.addPurchasedItems(
-                        dateCreated: dateCreated!,
-                        barcode: barcode,
-                        id: id,
-                        name: name,
-                        category: category,
-                        currentItemSold: itemSold!,
-                        quantitySold: amount,
-                        quantity: quantity!,
-                        price: price!,
-                        totalPrice: totalPriceItemSold!,
-                        expiryDate: expiryDate,
-                      );
+                    //TODO:: IF ITEM IS ALREADY EXPIRED DONT PURCHASE (DONE)
+                    int daysBetween(DateTime from, DateTime to) {
+                      from = DateTime(from.year, from.month, from.day);
+                      to = DateTime(to.year, to.month, to.day);
+                      return (to.difference(from).inDays).round();
                     }
-                    var pItemsDS = await pidb.purchasedItemsCollection.doc(id);
-                    if (pItems.exists) {
-                      pItemsDS.get().then((doc) async {
-                        newQS = doc.get('quantitySold');
-                        totPrice = doc.get('totalPrice');
 
-                        await pidb.updatePurchasedItems(
+                    final dateNow = DateTime.now();
+                    final expDate = DateTime.parse(
+                      expiryDate == "" ? getDateNow.toString() : expiryDate,
+                    );
+
+                    dayDifference = daysBetween(dateNow, expDate);
+
+                    if (dayDifference <= 0) {
+                      showToast(msg: 'Items is expired, cannot purchase item.');
+                    } else {
+                      var pItems =
+                          await pidb.purchasedItemsCollection.doc(id).get();
+                      if (!pItems.exists) {
+                        await pidb.addPurchasedItems(
+                          dateCreated: dateCreated!,
+                          barcode: barcode,
                           id: id,
                           name: name,
-                          barcode: barcode,
                           category: category,
-                          dateCreated: dateCreated!,
                           currentItemSold: itemSold!,
-                          expiryDate: expiryDate,
-                          quantitySold: newQS! + amount,
+                          quantitySold: amount,
                           quantity: quantity!,
                           price: price!,
-                          totalPrice: totPrice! + totalPriceItemSold!,
+                          totalPrice: totalPriceItemSold!,
+                          expiryDate: expiryDate,
                         );
-                      });
-                    }
+                      }
+                      var pItemsDS =
+                          await pidb.purchasedItemsCollection.doc(id);
+                      if (pItems.exists) {
+                        pItemsDS.get().then((doc) async {
+                          newQS = doc.get('quantitySold');
+                          totPrice = doc.get('totalPrice');
 
-                    showToast(msg: "Item Added");
-                    Navigator.pop(context);
+                          await pidb.updatePurchasedItems(
+                            id: id,
+                            name: name,
+                            barcode: barcode,
+                            category: category,
+                            dateCreated: dateCreated!,
+                            currentItemSold: itemSold!,
+                            expiryDate: expiryDate,
+                            quantitySold: newQS! + amount,
+                            quantity: quantity!,
+                            price: price!,
+                            totalPrice: totPrice! + totalPriceItemSold!,
+                          );
+                        });
+                      }
 
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          'Add more items?',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[800],
-                            fontWeight: FontWeight.bold,
+                      showToast(msg: "Item Added");
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            'Add more items?',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                              },
+                              child: Text(
+                                'Yes',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                              },
+                              child: Text(
+                                'No',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                            },
-                            child: Text(
-                              'Yes',
-                              style: TextStyle(
-                                color: Colors.green,
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                              Navigator.pop(context, true);
-                            },
-                            child: Text(
-                              'No',
-                              style: TextStyle(
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                      );
+                    }
                   },
                   child: Text(
                     'Yes',

@@ -17,7 +17,7 @@ class Forecast extends StatefulWidget {
 
 class _ForecastState extends State<Forecast> {
   static final _authController = Get.find<AuthController>();
-  var dateN = DateTime.now();
+  var dateN = DateTime.now(); //.subtract(Duration(hours: 730));
   var date = DateTime.now().add(Duration(hours: 8));
   late String dateMonth = DateFormat('MMMM').format(date);
 

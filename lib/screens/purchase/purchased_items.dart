@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:easi/screens/home/home.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
+import 'package:easi/screens/purchase_logs/purchase_logs.dart';
 import 'package:easi/services/product_database.dart';
+import 'package:easi/services/purchase_logs_database.dart';
 import 'package:easi/services/purchased_items_database.dart';
 import 'package:easi/services/sales_database.dart';
 import 'package:easi/widgets/app_loading.dart';
@@ -24,8 +26,10 @@ class PurchasedItems extends StatefulWidget {
 class _PurchasedItemsState extends State<PurchasedItems> {
   static final _authController = Get.find<AuthController>(); //user data
   final PurchasedItemsDB pidb = PurchasedItemsDB();
+  final PurchaseLogsDB pldb = PurchaseLogsDB();
   final ProductDB db = ProductDB();
   final SalesDB sdb = SalesDB();
+
   final _purchaseItemFormKey = GlobalKey<FormState>();
   final CollectionReference _purchasedItemsCollection = FirebaseFirestore
       .instance
@@ -61,13 +65,19 @@ class _PurchasedItemsState extends State<PurchasedItems> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Purchased Items'),
+        title: Text('Items Cart'),
         actions: [
           IconButton(
             onPressed: () {
               showSearch(context: context, delegate: PurchaseSearch());
             },
             icon: Icon(Icons.add),
+          ),
+          IconButton(
+            onPressed: () {
+              Get.to(() => PurchaseLogs());
+            },
+            icon: Icon(Icons.history),
           ),
         ],
       ),
@@ -78,7 +88,6 @@ class _PurchasedItemsState extends State<PurchasedItems> {
           double sum = 0;
           double totalPrice;
 
-          //TODO:: EXECUTE PURCHASE
           //check if has data
           await _purchasedItemsCollection.get().then((querySnapshot) async {
             if (querySnapshot.docs.isEmpty) {
@@ -186,11 +195,46 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
+                                    //TODO:: ADD TO LOGS
+
                                     //*UPDATE DATABASES
                                     String? pId;
+                                    String? name;
                                     int? pQuantitySold;
                                     int? quantity;
                                     int? currentItemSold;
+                                    double? price;
+                                    double? totPrice;
+
+                                    //*PURCHASE LOGS
+                                    //! CAN BE CHANGED
+                                    await _purchasedItemsCollection
+                                        .get()
+                                        .then((snapshot) {
+                                      snapshot.docs.forEach((item) async {
+                                        name = item.get('name');
+                                        pId = item.get('id');
+                                        quantity = item.get('quantity');
+                                        pQuantitySold =
+                                            item.get('quantitySold');
+                                        currentItemSold =
+                                            item.get('currentItemSold');
+                                        price = item.get('price');
+                                        currentItemSold =
+                                            currentItemSold! + pQuantitySold!;
+                                        quantity = quantity! - pQuantitySold!;
+
+                                        totPrice = price! * pQuantitySold!;
+                                        //UPDATE PRODUCT DETAILS
+
+                                        await pldb.addToLogs(
+                                          id: pId!,
+                                          name: name!,
+                                          numOfItemSold: pQuantitySold!,
+                                          totalPrice: totPrice!,
+                                        );
+                                      });
+                                    });
 
                                     await _purchasedItemsCollection
                                         .get()
@@ -202,12 +246,13 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                                             item.get('quantitySold');
                                         currentItemSold =
                                             item.get('currentItemSold');
-
+                                        price = item.get('price');
                                         currentItemSold =
                                             currentItemSold! + pQuantitySold!;
                                         quantity = quantity! - pQuantitySold!;
 
                                         //UPDATE PRODUCT DETAILS
+
                                         await db.purchaseProduct(
                                           id: pId!,
                                           quantity: quantity!,
@@ -316,6 +361,8 @@ class _PurchasedItemsState extends State<PurchasedItems> {
                         final double totalPrice =
                             data.get('totalPrice').toDouble();
                         final double price = data.get('price').toDouble();
+
+                        //TODO:: ADD TO LOGS
 
                         return Padding(
                           padding: const EdgeInsets.all(4.0),

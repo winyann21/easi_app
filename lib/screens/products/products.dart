@@ -464,7 +464,9 @@ class _ProductsState extends State<Products> {
                           //notif forecast
                           //!DURATION CAN BE CHANGED!
                           Future.delayed(Duration(seconds: 1), () async {
-                            var date = DateTime.now();
+                            var date = DateTime.now(); //.subtract(Duration(
+                            //hours:
+                            //730)); //*DEMO SUBTRACT 1 MONTH TO SHOW NOTIF
                             int? fId;
                             String? pName;
                             String? pMonth;
@@ -487,7 +489,9 @@ class _ProductsState extends State<Products> {
                                 });
                                 //show notification here
                                 //every 1hr notif //!can be changed
-                                cron.schedule(Schedule.parse('*/60 * * * *'),
+                                cron.schedule(
+                                    Schedule.parse(
+                                        '*/60 * * * *'), //*DEMO CHANGE TO 1 Minute to show notif
                                     () async {
                                   _notificationService.notificationsPlugin.show(
                                     fId!,

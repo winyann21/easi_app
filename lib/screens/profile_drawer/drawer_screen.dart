@@ -8,6 +8,7 @@ import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/products/product_status.dart';
 import 'package:easi/screens/purchase/purchase_search.dart';
 import 'package:easi/screens/purchase/purchased_items.dart';
+import 'package:easi/screens/purchase_logs/purchase_logs.dart';
 import 'package:easi/services/user_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,14 @@ class _DrawerScreenState extends State<DrawerScreen> {
                             menuIcon: Icons.shopping_basket_sharp,
                             onClicked: () {
                               Get.to(() => PurchasedItems());
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          buildMenuItem(
+                            menuName: 'Purchase History',
+                            menuIcon: Icons.history,
+                            onClicked: () {
+                              Get.to(() => PurchaseLogs());
                             },
                           ),
                           const SizedBox(height: 16),
