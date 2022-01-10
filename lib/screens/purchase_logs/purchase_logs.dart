@@ -33,8 +33,8 @@ class _PurchaseLogsState extends State<PurchaseLogs> {
         title: Text('Purchase History'),
         actions: [
           IconButton(
-            onPressed: () {
-              //clear history
+            onPressed: () async {
+              //TODO::clear history
             },
             icon: Icon(Icons.delete_sweep_sharp),
           ),
@@ -49,7 +49,7 @@ class _PurchaseLogsState extends State<PurchaseLogs> {
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder(
         stream: _purchasedLogsCollection
-            .orderBy('numOfItemSold', descending: true)
+            .orderBy('datePurchased', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {
