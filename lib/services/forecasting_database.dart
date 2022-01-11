@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';

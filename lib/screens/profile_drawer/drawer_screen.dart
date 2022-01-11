@@ -6,7 +6,6 @@ import 'package:easi/screens/forecast/forecast.dart';
 import 'package:easi/screens/notifications/notifications.dart';
 import 'package:easi/screens/products/functions/product_search.dart';
 import 'package:easi/screens/products/product_status.dart';
-import 'package:easi/screens/purchase/purchase_search.dart';
 import 'package:easi/screens/purchase/purchased_items.dart';
 import 'package:easi/screens/purchase_logs/purchase_logs.dart';
 import 'package:easi/services/user_database.dart';

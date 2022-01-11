@@ -17,10 +17,10 @@ class Forecast extends StatefulWidget {
 
 class _ForecastState extends State<Forecast> {
   static final _authController = Get.find<AuthController>();
-  // var dateN = DateTime.now(); //.subtract(Duration(hours: 372));
+
   var date = DateTime.now().add(Duration(
       hours:
-          744)); //trigger 1month ahead (+/-372hrs = 1month)744=1month ahead now
+          744)); //trigger 1month ahead (+/-372hrs = 1month) 744=1month ahead now
   late String dateMonth = DateFormat('MMMM').format(date);
 
   final ForecastDB fdb = ForecastDB();
@@ -57,9 +57,6 @@ class _ForecastState extends State<Forecast> {
         stream: _forecastCollection
             .doc(dateMonth)
             .collection('products')
-            // .where('dateForecasted',
-            //     isGreaterThanOrEqualTo:
-            //         DateTime(dateN.year, dateN.month + 1, 0))
             .orderBy('numOfItemSold', descending: true)
             .limit(3)
             .snapshots(),
@@ -160,9 +157,15 @@ class _ForecastState extends State<Forecast> {
                                                 color: Colors.black),
                                           ),
                                           TextSpan(
-                                            text: 'items.',
+                                            text: 'items. Revenue: ',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.normal,
+                                                color: Colors.black),
+                                          ),
+                                          TextSpan(
+                                            text: '$totRev',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
                                                 color: Colors.black),
                                           ),
                                         ],
@@ -171,11 +174,11 @@ class _ForecastState extends State<Forecast> {
                                     ),
                                     Text.rich(
                                       TextSpan(
-                                        text: 'With a total revenue of ',
+                                        text: 'Quantity Left: ',
                                         style: TextStyle(color: Colors.black),
                                         children: <InlineSpan>[
                                           TextSpan(
-                                            text: '$totRev',
+                                            text: '$quantityLeft',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black),

@@ -437,7 +437,6 @@ class _ProductsState extends State<Products> {
 
                           //*FORECASTING**/
                           //add most numOfItemSold item in collection
-
                           Future.delayed(Duration(seconds: 1), () async {
                             await _productCollection
                                 .orderBy('numOfItemSold', descending: true)
@@ -507,8 +506,6 @@ class _ProductsState extends State<Products> {
                               }
                             });
                           });
-                          //add notification for forecasting
-                          //add forecast screen for months(forecasted marketable item this month).
 
                           //*DISPLAY DATA
                           return Padding(
