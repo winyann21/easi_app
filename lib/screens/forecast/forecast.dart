@@ -82,6 +82,13 @@ class _ForecastState extends State<Forecast> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(height: 15),
+                      Text(
+                        dateMonth,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 32,
+                        ),
+                      ),
                       ListView(
                         shrinkWrap: true,
                         physics: const BouncingScrollPhysics(
@@ -104,13 +111,13 @@ class _ForecastState extends State<Forecast> {
                                   const EdgeInsets.symmetric(horizontal: 10.0),
                               child: Column(
                                 children: [
-                                  Text(
-                                    month,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 32,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   month,
+                                  //   style: TextStyle(
+                                  //     color: Colors.black,
+                                  //     fontSize: 32,
+                                  //   ),
+                                  // ),
                                   Padding(
                                     padding: const EdgeInsets.all(12.0),
                                     child: Column(
