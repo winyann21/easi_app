@@ -13,7 +13,6 @@ import 'package:easi/services/local_notification.dart';
 import 'package:easi/services/notification_database.dart';
 import 'package:easi/services/product_database.dart';
 import 'package:easi/services/sales_database.dart';
-import 'package:easi/utils/notification_id.dart';
 import 'package:easi/widgets/app_loading.dart';
 import 'package:easi/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
@@ -349,7 +348,8 @@ class _ProductsState extends State<Products> {
                             return (to.difference(from).inDays).round();
                           }
 
-                          final dateNow = DateTime.now();
+                          final dateNow =
+                              DateTime.now().add(Duration(hours: 8));
                           final expDate = DateTime.parse(
                             getExpiryDate == ""
                                 ? getDateNow.toString()
@@ -453,8 +453,10 @@ class _ProductsState extends State<Products> {
                                   final int fNumOfItemSold =
                                       doc.get('numOfItemSold');
                                   final String fPhotoUrl = doc.get('photoURL');
+                                  final int fQuantityLeft = doc.get('quantity');
 
                                   await fdb.addForecastedItem(
+                                    quantityLeft: fQuantityLeft,
                                     uniqueID: uniqueID,
                                     photoUrl: fPhotoUrl,
                                     name: fName,

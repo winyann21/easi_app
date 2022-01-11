@@ -24,6 +24,7 @@ class ForecastDB {
     required String month,
     required double price,
     required String photoUrl,
+    required int quantityLeft,
   }) async {
     try {
       await forecastCollection.doc(month).collection('products').doc(name).set({
@@ -34,6 +35,7 @@ class ForecastDB {
         'numOfItemSold': numOfItemSold,
         'price': price,
         'dateForecasted': FieldValue.serverTimestamp(),
+        'quantityLeft': quantityLeft,
       });
     } catch (e) {
       print(e);
