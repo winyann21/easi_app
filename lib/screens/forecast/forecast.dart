@@ -17,8 +17,10 @@ class Forecast extends StatefulWidget {
 
 class _ForecastState extends State<Forecast> {
   static final _authController = Get.find<AuthController>();
-  var dateN = DateTime.now(); //.subtract(Duration(hours: 730));
-  var date = DateTime.now().add(Duration(hours: 8));
+  // var dateN = DateTime.now(); //.subtract(Duration(hours: 372));
+  var date = DateTime.now().add(Duration(
+      hours:
+          372)); //trigger 1month ahead (+/-372hrs = 1month)744=1month ahead now
   late String dateMonth = DateFormat('MMMM').format(date);
 
   final ForecastDB fdb = ForecastDB();
@@ -53,10 +55,13 @@ class _ForecastState extends State<Forecast> {
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder(
         stream: _forecastCollection
-            .where('dateForecasted',
-                isGreaterThanOrEqualTo:
-                    DateTime(dateN.year, dateN.month + 1, 0))
-            .limit(1)
+            .doc(dateMonth)
+            .collection('products')
+            // .where('dateForecasted',
+            //     isGreaterThanOrEqualTo:
+            //         DateTime(dateN.year, dateN.month + 1, 0))
+            .orderBy('numOfItemSold', descending: true)
+            .limit(3)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) {

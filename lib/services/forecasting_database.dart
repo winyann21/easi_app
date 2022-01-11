@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:get/get.dart';
@@ -24,7 +26,7 @@ class ForecastDB {
     required String photoUrl,
   }) async {
     try {
-      await forecastCollection.doc(month).set({
+      await forecastCollection.doc(month).collection('products').doc(name).set({
         'month': month,
         'uniqueID': uniqueID,
         'photoUrl': photoUrl,

@@ -58,6 +58,12 @@ class _ProductsState extends State<Products> {
   var date = DateTime.now().add(Duration(hours: 8));
   late String dateMonth = DateFormat('MMMM').format(date);
 
+  //*FORECAST DATES
+  var fDate = DateTime.now().add(Duration(
+      hours:
+          744)); //trigger 1month ahead (+/-372hrs = 1month)744=1month ahead now
+  late String fDateMonth = DateFormat('MMMM').format(fDate);
+
   final List<String> productCategories = [
     'All',
     'Appliances',
@@ -435,7 +441,7 @@ class _ProductsState extends State<Products> {
                           Future.delayed(Duration(seconds: 1), () async {
                             await _productCollection
                                 .orderBy('numOfItemSold', descending: true)
-                                .limit(1)
+                                .limit(3)
                                 .get()
                                 .then((querySnapshot) {
                               if (querySnapshot.docs.isEmpty) {
@@ -449,7 +455,7 @@ class _ProductsState extends State<Products> {
                                   final String fPhotoUrl = doc.get('photoURL');
 
                                   await fdb.addForecastedItem(
-                                    uniqueID: createUniqueId(),
+                                    uniqueID: uniqueID,
                                     photoUrl: fPhotoUrl,
                                     name: fName,
                                     numOfItemSold: fNumOfItemSold,
@@ -464,19 +470,15 @@ class _ProductsState extends State<Products> {
                           //notif forecast
                           //!DURATION CAN BE CHANGED!
                           Future.delayed(Duration(seconds: 1), () async {
-                            var date = DateTime.now(); //.subtract(Duration(
-                            //hours:
-                            //730)); //*DEMO SUBTRACT 1 MONTH TO SHOW NOTIF
                             int? fId;
                             String? pName;
                             String? pMonth;
 
                             await _forecastCollection
-                                .where('dateForecasted',
-                                    isGreaterThanOrEqualTo:
-                                        DateTime(date.year, date.month + 1, 0))
+                                .doc(fDateMonth)
+                                .collection('products')
                                 .limit(1)
-                                .orderBy('dateForecasted')
+                                .orderBy('numOfItemSold', descending: true)
                                 .get()
                                 .then((querySnapshot) {
                               if (querySnapshot.docs.isEmpty) {

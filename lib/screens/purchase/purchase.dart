@@ -354,7 +354,90 @@ class _PurchaseState extends State<Purchase> {
 
                     dayDifference = daysBetween(dateNow, expDate);
 
-                    if (dayDifference <= 0) {
+                    if (expiryDate == "") {
+                      var pItems =
+                          await pidb.purchasedItemsCollection.doc(id).get();
+                      if (!pItems.exists) {
+                        await pidb.addPurchasedItems(
+                          dateCreated: dateCreated!,
+                          barcode: barcode,
+                          id: id,
+                          name: name,
+                          category: category,
+                          currentItemSold: itemSold!,
+                          quantitySold: amount,
+                          quantity: quantity!,
+                          price: price!,
+                          totalPrice: totalPriceItemSold!,
+                          expiryDate: expiryDate,
+                        );
+                      }
+                      var pItemsDS =
+                          await pidb.purchasedItemsCollection.doc(id);
+                      if (pItems.exists) {
+                        pItemsDS.get().then((doc) async {
+                          newQS = doc.get('quantitySold');
+                          totPrice = doc.get('totalPrice');
+
+                          await pidb.updatePurchasedItems(
+                            id: id,
+                            name: name,
+                            barcode: barcode,
+                            category: category,
+                            dateCreated: dateCreated!,
+                            currentItemSold: itemSold!,
+                            expiryDate: expiryDate,
+                            quantitySold: newQS! + amount,
+                            quantity: quantity!,
+                            price: price!,
+                            totalPrice: totPrice! + totalPriceItemSold!,
+                          );
+                        });
+                      }
+
+                      showToast(msg: "Item Added");
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            'Add more items?',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                              },
+                              child: Text(
+                                'Yes',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                                Navigator.pop(context, true);
+                              },
+                              child: Text(
+                                'No',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else if (dayDifference <= 0) {
                       showToast(msg: 'Items is expired, cannot purchase item.');
                     } else {
                       var pItems =
