@@ -469,7 +469,9 @@ class _ProductAddState extends State<ProductAdd> {
             String expiryDate = _expiryDateController.text;
             String category = value!;
             String tName = '';
+            String tBarcode = '';
 
+            //*CHECK IF NAME ALREADY EXISTS
             await _productCollection
                 .limit(1)
                 .where('name', isEqualTo: name)
@@ -483,6 +485,23 @@ class _ProductAddState extends State<ProductAdd> {
                 });
               }
             });
+
+            //*CHECK IF BARCODE ALREADY EXISTS
+            await _productCollection
+                .limit(1)
+                .where('barcode', isEqualTo: barcode)
+                .get()
+                .then((querySnapshot) {
+              if (querySnapshot.docs.isEmpty) {
+                print('No data to compare');
+              } else {
+                querySnapshot.docs.forEach((doc) async {
+                  tBarcode = doc.get('barcode');
+                });
+              }
+            });
+
+            //*EXECUTE ADD ITEM
 
             if (_pickedImage == null) {
               photoUrl = "";
@@ -498,7 +517,11 @@ class _ProductAddState extends State<ProductAdd> {
               photoUrl = await ref.getDownloadURL();
             }
 
-            if (name == tName) {
+            if (barcode == tBarcode && name == tName) {
+              showToast(msg: 'Item already exists');
+            } else if (barcode == tBarcode) {
+              showToast(msg: 'Barcode already exists');
+            } else if (name == tName) {
               showToast(msg: 'Name already exists');
             } else {
               Loading();

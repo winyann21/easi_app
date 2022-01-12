@@ -68,6 +68,7 @@ class _ProductEditState extends State<ProductEdit> {
   String productId = '';
   String dateMonth = DateFormat('MMMM').format(DateTime.now());
   String? oldName;
+  String? oldBarcode;
   final List<String> productCategories = [
     'All',
     'Appliances',
@@ -92,7 +93,6 @@ class _ProductEditState extends State<ProductEdit> {
     _nameController.text = (widget.data != null
         ? toBeginningOfSentenceCase(widget.data!.get('name'))
         : toBeginningOfSentenceCase(widget.name))!;
-    oldName = widget.data != null ? widget.data!.get('name') : widget.name;
     pCategory =
         widget.data != null ? widget.data!.get('category') : widget.category;
 
@@ -108,6 +108,12 @@ class _ProductEditState extends State<ProductEdit> {
     photoUrl =
         widget.data != null ? widget.data!.get('photoURL') : widget.photoUrl;
     productId = (widget.data != null ? widget.data!.id : widget.productId)!;
+
+    //*FOR VALIDATION
+    oldName = widget.data != null ? widget.data!.get('name') : widget.name;
+    oldBarcode =
+        widget.data != null ? widget.data!.get('barcode') : widget.barcode;
+    //***END */
 
     super.initState();
   }
@@ -566,7 +572,9 @@ class _ProductEditState extends State<ProductEdit> {
             String expiryDate = _expiryDateController.text;
             String category = pCategory!;
             String? tName;
+            String? tBarcode;
 
+            //*CHECK IF NAME EXISTS
             await _productCollection
                 .where('name', isEqualTo: name)
                 .limit(1)
@@ -577,6 +585,18 @@ class _ProductEditState extends State<ProductEdit> {
               });
             });
 
+            //*CHECK IF BARCODE EXISTS
+            await _productCollection
+                .where('barcode', isEqualTo: barcode)
+                .limit(1)
+                .get()
+                .then((querySnapshot) {
+              querySnapshot.docs.forEach((doc) async {
+                tBarcode = doc.get('barcode');
+              });
+            });
+
+            //*EXECUTE EDIT
             if (_pickedImage == null) {
             } else {
               final ref = FirebaseStorage.instance
@@ -588,7 +608,8 @@ class _ProductEditState extends State<ProductEdit> {
               await ref.putFile(_pickedImage!);
               photoUrl = await ref.getDownloadURL();
             }
-            if (name == oldName) {
+
+            if (name == oldName && barcode == oldBarcode) {
               await db
                   .updateProduct(
                 id: productId,
@@ -609,8 +630,60 @@ class _ProductEditState extends State<ProductEdit> {
               });
               showToast(msg: "Product Updated");
               Get.back();
+            } else if (name == oldName) {
+              if (barcode == tBarcode) {
+                showToast(msg: 'Barcode already exists');
+              } else {
+                await db
+                    .updateProduct(
+                  id: productId,
+                  photoURL: photoUrl,
+                  barcode: barcode,
+                  name: name,
+                  category: category,
+                  quantity: quantity,
+                  price: price,
+                  expiryDate: expiryDate,
+                )
+                    .then((value) {
+                  _barcodeController.clear();
+                  _nameController.clear();
+                  _priceController.clear();
+                  _quantityController.clear();
+                  _expiryDateController.clear();
+                });
+                showToast(msg: "Product Updated");
+                Get.back();
+              }
             } else if (name == tName) {
               showToast(msg: 'Name already exists');
+            } else if (barcode == oldBarcode) {
+              if (name == tName) {
+                showToast(msg: 'Name already exists');
+              } else {
+                await db
+                    .updateProduct(
+                  id: productId,
+                  photoURL: photoUrl,
+                  barcode: barcode,
+                  name: name,
+                  category: category,
+                  quantity: quantity,
+                  price: price,
+                  expiryDate: expiryDate,
+                )
+                    .then((value) {
+                  _barcodeController.clear();
+                  _nameController.clear();
+                  _priceController.clear();
+                  _quantityController.clear();
+                  _expiryDateController.clear();
+                });
+                showToast(msg: "Product Updated");
+                Get.back();
+              }
+            } else if (barcode == tBarcode) {
+              showToast(msg: 'Barcode already exists');
             } else {
               await db
                   .updateProduct(
