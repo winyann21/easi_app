@@ -1,14 +1,10 @@
 // ignore_for_file: avoid_print
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easi/controllers/auth_controller.dart';
 import 'package:get/get.dart';
 
 class ForecastDB {
-  // final currentUser = FirebaseAuth.instance.currentUser!;
-  // Users user = Users(uid: FirebaseAuth.instance.currentUser!.uid);
-
   final _authController = Get.find<AuthController>(); //user data
   late CollectionReference forecastCollection = FirebaseFirestore.instance
       .collection('users')
@@ -18,6 +14,7 @@ class ForecastDB {
   //*CREATE PRODUCTS
   Future<void> addForecastedItem({
     required int uniqueID,
+    required String prodId,
     required String name,
     required int numOfItemSold,
     required String month,
@@ -26,7 +23,7 @@ class ForecastDB {
     required int quantityLeft,
   }) async {
     try {
-      await forecastCollection.doc(month).collection('products').doc(name).set({
+      await forecastCollection.doc(month).collection('products').doc(prodId).set({
         'month': month,
         'uniqueID': uniqueID,
         'photoUrl': photoUrl,

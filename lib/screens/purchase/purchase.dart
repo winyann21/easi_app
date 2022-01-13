@@ -292,27 +292,6 @@ class _PurchaseState extends State<Purchase> {
     );
   }
 
-  // Widget enterCash() {
-  //   return RoundRectTextFormField(
-  //     controller: _enterCash,
-  //     prefixIcon: Icons.attach_money_sharp,
-  //     hintText: 'Enter Cash',
-  //     labelText: 'Cash',
-  //     suffixIcon: null,
-  //     keyboardType: TextInputType.number,
-  //     textInputAction: TextInputAction.next,
-  //     validator: (value) {
-  //       if (value!.isEmpty) {
-  //         return "Field is required";
-  //       } else if (double.parse(value) < double.parse(total.toString())) {
-  //         return "Not enough cash";
-  //       } else {
-  //         return null;
-  //       }
-  //     },
-  //   );
-  // }
-
   Widget purchaseBtn() {
     return FloatingActionButton(
       onPressed: () async {

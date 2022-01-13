@@ -453,8 +453,10 @@ class _ProductsState extends State<Products> {
                                       doc.get('numOfItemSold');
                                   final String fPhotoUrl = doc.get('photoURL');
                                   final int fQuantityLeft = doc.get('quantity');
+                                  final String fProdId = doc.id;
 
                                   await fdb.addForecastedItem(
+                                    prodId: fProdId,
                                     quantityLeft: fQuantityLeft,
                                     uniqueID: uniqueID,
                                     photoUrl: fPhotoUrl,

@@ -20,8 +20,6 @@ class ProductEdit extends StatefulWidget {
   final String? productId, name, barcode, category, photoUrl, expiryDate;
   final double? price;
   final int? quantity;
-
-  // final ProductModel? products;
   final QueryDocumentSnapshot<Object?>? data;
 
   const ProductEdit({
@@ -118,16 +116,6 @@ class _ProductEditState extends State<ProductEdit> {
     super.initState();
   }
 
-  // @override
-  // void dispose() {
-  //   _barcodeController.dispose();
-  //   _nameController.dispose();
-  //   _typeController.dispose();
-  //   _quantityController.dispose();
-  //   _priceController.dispose();
-  //   _expiryDateController.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
