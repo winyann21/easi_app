@@ -1,6 +1,6 @@
 # easi
 
-A new Flutter project.
+An Android Smart Inventory App
 
 ## Getting Started
 
